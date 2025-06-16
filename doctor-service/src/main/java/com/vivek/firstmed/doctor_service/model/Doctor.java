@@ -1,28 +1,23 @@
-package com.vivek.firstmed.patient_service.model;
+package com.vivek.firstmed.doctor_service.model;
 
-import java.time.LocalDate;
-
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Past;
-import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
+import java.time.LocalDate;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Patient {
+@Entity
+public class Doctor {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int patientId;
-    
+    @Column(length = 10)
+    private String doctorId; // e.g., "D1001"
+
     @NotBlank(message = "First name is required")
     private String firstName;
 
@@ -45,6 +40,9 @@ public class Patient {
 
     @Email(message = "Email should be valid")
     private String email;
+
+    @NotBlank(message = "Specialization is required")
+    private String specialization;
 
     @NotBlank(message = "Address is required")
     private String address;
