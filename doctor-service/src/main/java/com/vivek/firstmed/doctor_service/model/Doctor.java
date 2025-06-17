@@ -15,8 +15,8 @@ import java.time.LocalDate;
 public class Doctor {
 
     @Id
-    @Column(length = 10)
-    private String doctorId; // e.g., "D1001"
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private String doctorId; 
 
     @NotBlank(message = "First name is required")
     private String firstName;
