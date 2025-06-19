@@ -1,27 +1,38 @@
-package com.vivek.firstmed.doctor_service.model;
+package com.vivek.firstmed.patient_service.entity;
 
+import java.time.LocalDate;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Past;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
-import java.time.LocalDate;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
-public class Doctor {
+public class Patient {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String doctorId; 
-
+    private int patientId;
+    
     @NotBlank(message = "First name is required")
+    @Size(min = 2, max = 50)
     private String firstName;
 
     @NotBlank(message = "Last name is required")
+    @Size(min = 2, max = 500)
     private String lastName;
 
     @NotBlank(message = "Gender is required")
@@ -41,9 +52,10 @@ public class Doctor {
     @Email(message = "Email should be valid")
     private String email;
 
-    @NotBlank(message = "Specialization is required")
-    private String specialization;
-
     @NotBlank(message = "Address is required")
     private String address;
+
+    @OneToOne(mappedBy = "patient", cascade = CascadeType.ALL)
+    @Valid
+    private PatientHealthRecord healthRecord;
 }

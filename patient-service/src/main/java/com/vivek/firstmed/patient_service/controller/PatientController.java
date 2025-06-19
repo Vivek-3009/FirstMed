@@ -1,7 +1,7 @@
 package com.vivek.firstmed.patient_service.controller;
 
 import com.vivek.firstmed.patient_service.dto.PatientDto;
-import com.vivek.firstmed.patient_service.model.Patient;
+import com.vivek.firstmed.patient_service.entity.Patient;
 import com.vivek.firstmed.patient_service.PatientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
