@@ -3,8 +3,6 @@ package com.vivek.firstmed.patient_service.entity;
 import java.time.LocalDate;
 
 import jakarta.persistence.CascadeType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
 import jakarta.validation.Valid;
@@ -24,8 +22,7 @@ import lombok.NoArgsConstructor;
 public class Patient {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int patientId;
+    private String patientId;
     
     @NotBlank(message = "First name is required")
     @Size(min = 2, max = 50)
