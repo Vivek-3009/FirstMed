@@ -1,9 +1,14 @@
 package com.vivek.firstmed.patient_service.entity;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
@@ -23,7 +28,7 @@ public class Patient {
 
     @Id
     private String patientId;
-    
+
     @NotBlank(message = "First name is required")
     @Size(min = 2, max = 50)
     private String firstName;
@@ -40,10 +45,7 @@ public class Patient {
     private LocalDate dateOfBirth;
 
     @NotBlank(message = "Phone number is required")
-    @Pattern(
-        regexp = "^(\\+91)?[6-9]\\d{9}$",
-        message = "Phone number must be a valid Indian number"
-    )
+    @Pattern(regexp = "^(\\+91)?[6-9]\\d{9}$", message = "Phone number must be a valid Indian number")
     private String phoneNumber;
 
     @Email(message = "Email should be valid")
@@ -52,7 +54,14 @@ public class Patient {
     @NotBlank(message = "Address is required")
     private String address;
 
-    @OneToOne(mappedBy = "patient", cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "primary_patient_id")
+    private Patient primaryPatient;
+
+    @OneToMany(mappedBy = "primaryPatient", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Patient> familyMembers;
+
+    @OneToOne(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true)
     @Valid
     private PatientHealthRecord healthRecord;
 }

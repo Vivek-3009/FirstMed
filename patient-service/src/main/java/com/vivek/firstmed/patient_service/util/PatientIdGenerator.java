@@ -1,6 +1,5 @@
 package com.vivek.firstmed.patient_service.util;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.vivek.firstmed.patient_service.entity.Patient;
