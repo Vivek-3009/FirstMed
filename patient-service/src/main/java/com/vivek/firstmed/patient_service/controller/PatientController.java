@@ -1,6 +1,7 @@
 package com.vivek.firstmed.patient_service.controller;
 
 import com.vivek.firstmed.patient_service.dto.PatientDto;
+import com.vivek.firstmed.patient_service.exception.ResourceNotFoundException;
 import com.vivek.firstmed.patient_service.service.PatientService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -42,6 +43,9 @@ public class PatientController {
     @GetMapping("/{patientId}")
     public ResponseEntity<PatientDto> getPatientById(@PathVariable String patientId) {
         PatientDto patient = patientService.getPatientById(patientId);
+        if (patient == null) {
+            throw new ResourceNotFoundException("Patient not found with id: " + patientId);
+        }
         return ResponseEntity.ok(patient);
     }
 
@@ -63,6 +67,9 @@ public class PatientController {
             @PathVariable String patientId,
             @Validated @RequestBody PatientDto patientDto) {
         PatientDto updated = patientService.updatePatient(patientId, patientDto);
+        if (updated == null) {
+            throw new ResourceNotFoundException("Patient not found with id: " + patientId);
+        }
         return ResponseEntity.ok(updated);
     }
 
@@ -73,6 +80,10 @@ public class PatientController {
     })
     @DeleteMapping("/{patientId}")
     public ResponseEntity<Void> deletePatient(@PathVariable String patientId) {
+        PatientDto patient = patientService.getPatientById(patientId);
+        if (patient == null) {
+            throw new ResourceNotFoundException("Patient not found with id: " + patientId);
+        }
         patientService.deletePatient(patientId);
         return ResponseEntity.noContent().build();
     }
