@@ -3,7 +3,11 @@ package com.vivek.firstmed.patient_service.entity;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
@@ -12,16 +16,11 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Past;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @NoArgsConstructor
@@ -31,41 +30,45 @@ import lombok.NoArgsConstructor;
 public class Patient {
 
     @Id
+    @Column(length = 10)
     private String patientId;
 
-    @NotBlank(message = "First name is required")
-    @Size(min = 2, max = 50)
+    @Column(nullable = false, length = 50)
     private String firstName;
 
-    @NotBlank(message = "Last name is required")
-    @Size(min = 2, max = 500)
+    @Column(nullable = false, length = 50)
     private String lastName;
 
-    @NotBlank(message = "Gender is required")
+    @Column(nullable = false, length = 10)
     private String gender;
 
-    @NotNull(message = "Date of birth is required")
-    @Past(message = "Date of birth must be in the past")
+    @Column(nullable = false)
     private LocalDate dateOfBirth;
 
-    @NotBlank(message = "Phone number is required")
-    @Pattern(regexp = "^(\\+91)?[6-9]\\d{9}$", message = "Phone number must be a valid Indian number")
+    @Column(nullable = false, length = 15)
     private String phoneNumber;
 
-    @Email(message = "Email should be valid")
+    @Column(length = 255)
     private String email;
 
-    @NotBlank(message = "Address is required")
+    @Column(nullable = false)
     private String address;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "primary_patient_id")
+    @JsonBackReference
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Patient primaryPatient;
 
     @OneToMany(mappedBy = "primaryPatient", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private List<Patient> familyMembers;
 
     @OneToOne(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Valid
-    private PatientHealthRecord healthRecord;
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private HealthRecord healthRecord;
 }

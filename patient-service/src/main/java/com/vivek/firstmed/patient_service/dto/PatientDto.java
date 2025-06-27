@@ -19,14 +19,17 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class PatientDto {
 
-    private String patientId; 
-    
+    @NotBlank(message = "Patient ID is required")
+    @Size(min = 5, max = 10, message = "Patient ID must be between 5 and 10 characters")
+    @Pattern(regexp = "^P\\d{4,}$", message = "Patient ID must start with 'P' followed by at least 4 digits")
+    private String patientId;
+
     @NotBlank(message = "First name is required")
-    @Size(min = 2, max = 50)
+    @Size(min = 2, max = 50, message = "First name must be between 2 and 50 characters")
     private String firstName;
 
     @NotBlank(message = "Last name is required")
-    @Size(min = 2, max = 50)
+    @Size(min = 2, max = 50, message = "Last name must be between 2 and 50 characters")
     private String lastName;
 
     @NotBlank(message = "Gender is required")
@@ -54,5 +57,5 @@ public class PatientDto {
     private List<@Valid PatientDto> familyMembers;
 
     @Valid
-    private PatientHealthRecordDto healthRecord;
+    private HealthRecordDto healthRecord;
 }

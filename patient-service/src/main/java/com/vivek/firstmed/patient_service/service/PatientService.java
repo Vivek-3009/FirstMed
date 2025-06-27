@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import com.vivek.firstmed.patient_service.dto.PatientDto;
 import com.vivek.firstmed.patient_service.entity.Patient;
 import com.vivek.firstmed.patient_service.repository.PatientRepository;
-import com.vivek.firstmed.patient_service.util.PatientIdGenerator;
 import com.vivek.firstmed.patient_service.util.PatientMapperUtil;
 
 @Service
@@ -16,19 +15,19 @@ public class PatientService {
 
     private PatientRepository patientRepository;
     private PatientMapperUtil patientMapperUtil;
-    private PatientIdGenerator patientIdGenerator;
+    private IdGeneratorService idGeneratorService;
 
     public PatientService(
             PatientRepository patientRepository,
             PatientMapperUtil patientMapperUtil,
-            PatientIdGenerator patientIdGenerator) {
+            IdGeneratorService idGeneratorService) {
         this.patientRepository = patientRepository;
         this.patientMapperUtil = patientMapperUtil;
-        this.patientIdGenerator = patientIdGenerator;
+        this.idGeneratorService = idGeneratorService;
     }
 
     public PatientDto createPatient(PatientDto patientDto) {
-        String newId = patientIdGenerator.generatePatientId();
+        String newId = idGeneratorService.generatePatientId();
         patientDto.setPatientId(newId);
         Patient patient = patientMapperUtil.dtoToEntity(patientDto);
         Patient saved = patientRepository.save(patient);
