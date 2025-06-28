@@ -119,11 +119,37 @@ public class PatientController {
     @DeleteMapping("/{patientId}")
     public ResponseEntity<Void> deletePatient(@PathVariable String patientId) {
         validatePatientId(patientId);
-        PatientDto patient = patientService.getPatientById(patientId);
-        if (patient == null) {
-            throw new ResourceNotFoundException("Patient not found with id: " + patientId);
-        }
         patientService.deletePatient(patientId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Add a new family member to a patient")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Family member added successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid input", content = @Content(schema = @Schema(implementation = ServiceApiResponse.class)))
+    })
+    @PostMapping("/{patientId}/family")
+    public ResponseEntity<ServiceApiResponse<PatientDto>> addFamilyMember(@PathVariable("patientId") String primaryPatientId, @Valid @RequestBody PatientDto familyMemberDto) {
+        PatientDto createdPatient = patientService.addFamilyMember(primaryPatientId,familyMemberDto);
+        ServiceApiResponse<PatientDto> response = new ServiceApiResponse<>(
+                "success",
+                "Family member added successfully",
+                createdPatient);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @Operation(summary = "Remove patient family member by ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Family member removed successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid Family member ID format"),
+            @ApiResponse(responseCode = "404", description = "Patient or Family member not found")
+    })
+    @DeleteMapping("/{patientId}/family/{familyMemberId}")
+    public ResponseEntity<Void> removePatientFamilyMember(@PathVariable("patientId") String primaryPatientId, 
+                                                          @PathVariable String familyMemberId) {
+        validatePatientId(primaryPatientId);
+        validatePatientId(familyMemberId);
+        patientService.removeFamilyMember(primaryPatientId, familyMemberId);
         return ResponseEntity.noContent().build();
     }
 }
