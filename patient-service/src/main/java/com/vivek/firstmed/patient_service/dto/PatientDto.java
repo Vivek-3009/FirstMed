@@ -19,7 +19,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class PatientDto {
 
-    @NotBlank(message = "Patient ID is required")
     @Size(min = 5, max = 10, message = "Patient ID must be between 5 and 10 characters")
     @Pattern(regexp = "^P\\d{4,}$", message = "Patient ID must start with 'P' followed by at least 4 digits")
     private String patientId;

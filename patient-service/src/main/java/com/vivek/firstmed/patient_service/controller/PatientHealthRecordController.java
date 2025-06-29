@@ -7,7 +7,14 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.vivek.firstmed.patient_service.dto.HealthRecordDto;
 import com.vivek.firstmed.patient_service.dto.ServiceApiResponse;
@@ -18,9 +25,13 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @Controller
+@RequestMapping("/api/health-records")
+@Tag(name = "Health Record", description = "Health Records management APIs")
+@Validated
 public class PatientHealthRecordController {
 
     private final HealthRecordService healthRecordService;
@@ -34,6 +45,7 @@ public class PatientHealthRecordController {
         @ApiResponse(responseCode = "201", description = "Health record created successfully"),
         @ApiResponse(responseCode = "400", description = "Invalid input data", content = @Content(schema = @Schema(implementation = ServiceApiResponse.class))),
     })
+    @PostMapping
     public ResponseEntity<ServiceApiResponse<HealthRecordDto>> createHealthRecord(@Valid @RequestBody HealthRecordDto healthRecordDto) {
         HealthRecordDto createdRecord = healthRecordService.createHealthRecord(healthRecordDto);
         ServiceApiResponse<HealthRecordDto> response = new ServiceApiResponse<>(
@@ -49,7 +61,8 @@ public class PatientHealthRecordController {
         @ApiResponse(responseCode = "400", description = "Invalid health record ID format"),
         @ApiResponse(responseCode = "404", description = "Health record not found")
     })
-    public ResponseEntity<ServiceApiResponse<HealthRecordDto>> getHealthRecordById(String healthRecordId) {
+    @GetMapping("/{healthRecordId}")
+    public ResponseEntity<ServiceApiResponse<HealthRecordDto>> getHealthRecordById(@PathVariable String healthRecordId) {
         validateHealthRecordId(healthRecordId);
         HealthRecordDto healthRecord = healthRecordService.getHealthRecordById(healthRecordId);
         ServiceApiResponse<HealthRecordDto> response = new ServiceApiResponse<>(
@@ -65,7 +78,8 @@ public class PatientHealthRecordController {
         @ApiResponse(responseCode = "400", description = "Invalid input data or health record ID format"),
         @ApiResponse(responseCode = "404", description = "Health record not found")
     })
-    public ResponseEntity<ServiceApiResponse<HealthRecordDto>> updateHealthRecord(String healthRecordId, @Valid @RequestBody HealthRecordDto healthRecordDto) {
+    @PutMapping("/{healthRecordId}")
+    public ResponseEntity<ServiceApiResponse<HealthRecordDto>> updateHealthRecord(@PathVariable String healthRecordId, @Valid @RequestBody HealthRecordDto healthRecordDto) {
         validateHealthRecordId(healthRecordId);
         HealthRecordDto updatedRecord = healthRecordService.updateHealthRecord(healthRecordId, healthRecordDto);
         ServiceApiResponse<HealthRecordDto> response = new ServiceApiResponse<>(
@@ -81,7 +95,8 @@ public class PatientHealthRecordController {
         @ApiResponse(responseCode = "400", description = "Invalid health record ID format"),
         @ApiResponse(responseCode = "404", description = "Health record not found")
     })
-    public ResponseEntity<Void> deleteHealthRecord(String healthRecordId) {
+    @DeleteMapping("/{healthRecordId}")
+    public ResponseEntity<Void> deleteHealthRecord(@PathVariable String healthRecordId) {
         validateHealthRecordId(healthRecordId);
         healthRecordService.deleteHealthRecord(healthRecordId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
@@ -89,6 +104,7 @@ public class PatientHealthRecordController {
 
     @Operation(summary = "Get all health records")
     @ApiResponse(responseCode = "200", description = "List of all health records")
+    @GetMapping
     public ResponseEntity<ServiceApiResponse<List<HealthRecordDto>>> getAllHealthRecords() {
         List<HealthRecordDto> healthRecords = healthRecordService.getAllHealthRecords();
         ServiceApiResponse<List<HealthRecordDto>> response = new ServiceApiResponse<>(

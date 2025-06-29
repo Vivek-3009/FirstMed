@@ -76,18 +76,6 @@ public class PatientController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "Get all patients")
-    @ApiResponse(responseCode = "200", description = "List of patients")
-    @GetMapping
-    public ResponseEntity<ServiceApiResponse<List<PatientDto>>> getAllPatients() {
-        List<PatientDto> patients = patientService.getAllPatients();
-        ServiceApiResponse<List<PatientDto>> response = new ServiceApiResponse<>(
-                "success",
-                "All patients fetched",
-                patients);
-        return ResponseEntity.ok(response);
-    }
-
     @Operation(summary = "Update patient by ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Patient updated successfully"),
@@ -121,6 +109,18 @@ public class PatientController {
         validatePatientId(patientId);
         patientService.deletePatient(patientId);
         return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Get all patients")
+    @ApiResponse(responseCode = "200", description = "List of patients")
+    @GetMapping
+    public ResponseEntity<ServiceApiResponse<List<PatientDto>>> getAllPatients() {
+        List<PatientDto> patients = patientService.getAllPatients();
+        ServiceApiResponse<List<PatientDto>> response = new ServiceApiResponse<>(
+                "success",
+                "All patients fetched",
+                patients);
+        return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "Add a new family member to a patient")
