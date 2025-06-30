@@ -84,6 +84,9 @@ public class PatientServiceImpl implements PatientService {
         Patient primaryPatient = patientRepository.findById(primaryPatientId)
                 .orElseThrow(
                         () -> new ResourceNotFoundException("Primary patient not found with ID: " + primaryPatientId));
+        if(primaryPatient.getPrimaryPatient() != null) {
+            throw new IllegalArgumentException("Cannot add family member to a family member.");
+        }
         String newId = idGeneratorService.generatePatientId();
         familyMemberDto.setPatientId(newId);
         Patient familyMember = patientMapperUtil.dtoToEntity(familyMemberDto);

@@ -96,10 +96,14 @@ public class PatientHealthRecordController {
         @ApiResponse(responseCode = "404", description = "Health record not found")
     })
     @DeleteMapping("/{healthRecordId}")
-    public ResponseEntity<Void> deleteHealthRecord(@PathVariable String healthRecordId) {
+    public ResponseEntity<ServiceApiResponse<Void>> deleteHealthRecord(@PathVariable String healthRecordId) {
         validateHealthRecordId(healthRecordId);
         healthRecordService.deleteHealthRecord(healthRecordId);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        ServiceApiResponse<Void> response = new ServiceApiResponse<>(
+                "success",
+                "Health record deleted successfully",
+                null);
+        return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "Get all health records")

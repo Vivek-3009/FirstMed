@@ -105,10 +105,14 @@ public class PatientController {
             @ApiResponse(responseCode = "404", description = "Patient not found")
     })
     @DeleteMapping("/{patientId}")
-    public ResponseEntity<Void> deletePatient(@PathVariable String patientId) {
+    public ResponseEntity<ServiceApiResponse<Void>> deletePatient(@PathVariable String patientId) {
         validatePatientId(patientId);
         patientService.deletePatient(patientId);
-        return ResponseEntity.noContent().build();
+        ServiceApiResponse<Void> response = new ServiceApiResponse<>(
+                "success",
+                "Patient deleted successfully",
+                null);
+        return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "Get all patients")

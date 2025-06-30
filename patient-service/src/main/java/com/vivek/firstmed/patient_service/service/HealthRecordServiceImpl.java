@@ -3,6 +3,7 @@ package com.vivek.firstmed.patient_service.service;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.vivek.firstmed.patient_service.dto.HealthRecordDto;
 import com.vivek.firstmed.patient_service.entity.HealthRecord;
@@ -12,8 +13,6 @@ import com.vivek.firstmed.patient_service.repository.HealthRecordRepository;
 import com.vivek.firstmed.patient_service.repository.PatientRepository;
 import com.vivek.firstmed.patient_service.util.HealthRecordMapperUtil;
 
-import org.springframework.transaction.annotation.Transactional;
-
 @Service
 public class HealthRecordServiceImpl implements HealthRecordService {
 
@@ -22,7 +21,7 @@ public class HealthRecordServiceImpl implements HealthRecordService {
     private final IdGeneratorService idGeneratorService;
     private final PatientRepository patientRepository;
 
-    public HealthRecordService(
+    public HealthRecordServiceImpl(
             HealthRecordRepository healthRecordRepository,
             HealthRecordMapperUtil healthRecordMapperUtil,
             IdGeneratorService idGeneratorService,
@@ -38,7 +37,8 @@ public class HealthRecordServiceImpl implements HealthRecordService {
         String newId = idGeneratorService.generateHealthRecordId();
         healthRecordDto.setHealthRecordId(newId);
         Patient patient = patientRepository.findById(healthRecordDto.getPatientId())
-        .orElseThrow(() -> new ResourceNotFoundException("Patient not found with ID: " + healthRecordDto.getPatientId()));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Patient not found with ID: " + healthRecordDto.getPatientId()));
         HealthRecord healthRecord = healthRecordMapperUtil.dtoToEntity(healthRecordDto);
         healthRecord.setPatient(patient);
         patient.setHealthRecord(healthRecord);
@@ -70,8 +70,12 @@ public class HealthRecordServiceImpl implements HealthRecordService {
 
     @Transactional
     public void deleteHealthRecord(String healthRecordId) {
-        if (!healthRecordRepository.existsById(healthRecordId)) {
-            throw new ResourceNotFoundException("Health record not found with ID: " + healthRecordId);
+        HealthRecord healthRecord = healthRecordRepository.findById(healthRecordId)
+                .orElseThrow(() -> new ResourceNotFoundException("Health record not found with ID: " + healthRecordId));
+        Patient patient = healthRecord.getPatient();
+        if (patient != null) {
+            patient.setHealthRecord(null);
+            patientRepository.save(patient);
         }
         healthRecordRepository.deleteById(healthRecordId);
     }
