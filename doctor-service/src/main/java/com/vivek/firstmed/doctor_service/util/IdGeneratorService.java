@@ -1,7 +1,10 @@
 package com.vivek.firstmed.doctor_service.util;
 
+import org.springframework.stereotype.Component;
+
 import com.vivek.firstmed.doctor_service.repository.DoctorRepository;
 
+@Component
 public class IdGeneratorService {
     
     private final DoctorRepository doctorRepository;

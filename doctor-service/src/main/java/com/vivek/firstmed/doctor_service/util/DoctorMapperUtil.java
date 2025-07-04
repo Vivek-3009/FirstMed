@@ -1,10 +1,12 @@
 package com.vivek.firstmed.doctor_service.util;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.stereotype.Component;
 
 import com.vivek.firstmed.doctor_service.dto.DoctorDto;
 import com.vivek.firstmed.doctor_service.entity.Doctor;
 
+@Component
 public class DoctorMapperUtil {
 
     private final ModelMapper modelMapper;

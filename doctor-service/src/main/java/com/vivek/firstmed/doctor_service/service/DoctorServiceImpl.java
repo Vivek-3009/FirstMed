@@ -3,6 +3,7 @@ package com.vivek.firstmed.doctor_service.service;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.vivek.firstmed.doctor_service.dto.DoctorDto;
@@ -12,6 +13,7 @@ import com.vivek.firstmed.doctor_service.repository.DoctorRepository;
 import com.vivek.firstmed.doctor_service.util.DoctorMapperUtil;
 import com.vivek.firstmed.doctor_service.util.IdGeneratorService;
 
+@Service
 public class DoctorServiceImpl implements DoctorService {
     
     private final DoctorRepository doctorRepository;
