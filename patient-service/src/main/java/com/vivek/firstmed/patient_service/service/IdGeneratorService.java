@@ -35,13 +35,13 @@ public class IdGeneratorService {
     public String generateHealthRecordId(){
         String lastId = healthRecordRepository.findTopByOrderByHealthRecordIdDesc()
                 .map(HealthRecord::getHealthRecordId)
-                .orElse("PHR1000");
+                .orElse("HR1000");
         
-        if(!lastId.matches("^PHR\\d+$")) {
+        if(!lastId.matches("^HR\\d+$")) {
             throw new IllegalStateException("Invalid health record ID format: " + lastId);
         }
 
         int num = Integer.parseInt(lastId.substring(3)) + 1;
-        return String.format("PHR%04d", num);
+        return String.format("HR%04d", num);
     }
 }

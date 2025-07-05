@@ -1,12 +1,13 @@
 package com.vivek.firstmed.doctor_service.entity;
 
+import java.time.LocalDate;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
-import java.time.LocalDate;
 
 @Data
 @NoArgsConstructor
@@ -15,35 +16,30 @@ import java.time.LocalDate;
 public class Doctor {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String doctorId; 
+    @Column(length = 10)
+    private String doctorId;
 
-    @NotBlank(message = "First name is required")
+    @Column(nullable = false, length = 50)
     private String firstName;
 
-    @NotBlank(message = "Last name is required")
+    @Column(nullable = false, length = 50)
     private String lastName;
 
-    @NotBlank(message = "Gender is required")
+    @Column(nullable = false, length = 50)
     private String gender;
 
-    @NotNull(message = "Date of birth is required")
-    @Past(message = "Date of birth must be in the past")
+    @Column(nullable = false)
     private LocalDate dateOfBirth;
 
-    @NotBlank(message = "Phone number is required")
-    @Pattern(
-        regexp = "^(\\+91)?[6-9]\\d{9}$",
-        message = "Phone number must be a valid Indian number"
-    )
+    @Column(nullable = false, length = 15)
     private String phoneNumber;
 
-    @Email(message = "Email should be valid")
+    @Column(length = 255)
     private String email;
 
-    @NotBlank(message = "Specialization is required")
+    @Column(nullable = false, length = 50)
     private String specialization;
 
-    @NotBlank(message = "Address is required")
+    @Column(nullable = false, length = 255)
     private String address;
 }
