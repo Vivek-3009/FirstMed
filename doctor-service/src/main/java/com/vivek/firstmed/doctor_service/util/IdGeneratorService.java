@@ -20,6 +20,6 @@ public class IdGeneratorService {
                     int newId = Integer.parseInt(lastId.substring(1)) + 1;
                     return "D" + newId;
                 })
-                .orElse("D1000");
+                .orElse("D10001");
     }
 }
