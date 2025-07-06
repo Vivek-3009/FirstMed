@@ -8,13 +8,17 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class DoctorDto {
 
-    @Size(min = 5, max = 10, message = "Patient ID must be between 5 and 10 characters")
-    @Pattern(regexp = "^D\\d{4,}$", message = "Patient ID must start with 'D' followed by at least 4 digits")
+    @Size(min = 5, max = 10, message = "Doctor ID must be between 5 and 10 characters")
+    @Pattern(regexp = "^D\\d{4,}$", message = "Doctor ID must start with 'D' followed by at least 4 digits")
     private String doctorId;
     
     @NotBlank(message = "First name is required")

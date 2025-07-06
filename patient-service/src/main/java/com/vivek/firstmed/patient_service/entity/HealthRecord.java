@@ -7,6 +7,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,6 +19,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Table(name = "patient_health_records")
 public class HealthRecord {
+
+    @PrePersist
+    public void setLastUpdated() {
+        this.lastUpdated = LocalDate.now();
+    }
 
     @Id
     @Column(length = 10)
@@ -42,5 +48,5 @@ public class HealthRecord {
     @Column(length = 1000)
     private String medicalHistory;
 
-    private LocalDate lastUpdated = LocalDate.now();
+    private LocalDate lastUpdated;
 }

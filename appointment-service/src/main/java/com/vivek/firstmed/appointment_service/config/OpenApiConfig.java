@@ -1,4 +1,4 @@
-package com.vivek.firstmed.doctor_service.config;
+package com.vivek.firstmed.appointment_service.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,9 +14,9 @@ public class OpenApiConfig {
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
             .info(new Info()
-                .title("Doctor Service API")
+                .title("Appointment Service API")
                 .version("1.0")
-                .description("API documentation for doctor microservice")
+                .description("API documentation for appointment microservice")
                 .contact(new Contact().name("FirstMed").email("vivekbisht3009@gmail.com"))
             );
     }
