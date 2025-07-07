@@ -56,8 +56,8 @@ public class PatientServiceImpl implements PatientService {
     }
 
     @Transactional
-    public PatientDto updatePatient(String patientId, PatientDto patientDto) {
-        return patientRepository.findById(patientId).map(
+    public PatientDto updatePatient(PatientDto patientDto) {
+        return patientRepository.findById(patientDto.getPatientId()).map(
                 existingPatient -> {
                     existingPatient.setFirstName(patientDto.getFirstName());
                     existingPatient.setLastName(patientDto.getLastName());
@@ -68,7 +68,7 @@ public class PatientServiceImpl implements PatientService {
                     Patient updated = patientRepository.save(existingPatient);
                     return patientMapperUtil.entityToDto(updated);
                 })
-                .orElseThrow(() -> new ResourceNotFoundException("Patient not found with ID: " + patientId));
+                .orElseThrow(() -> new ResourceNotFoundException("Patient not found with ID: " + patientDto.getPatientId()));
     }
 
     @Transactional

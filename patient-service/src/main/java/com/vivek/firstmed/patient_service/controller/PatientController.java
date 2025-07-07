@@ -82,14 +82,12 @@ public class PatientController {
                         @ApiResponse(responseCode = "400", description = "Invalid Patient ID format"),
                         @ApiResponse(responseCode = "404", description = "Patient not found")
         })
-        @PutMapping("/{patientId}")
+        @PutMapping
         public ResponseEntity<ServiceApiResponse<PatientDto>> updatePatient(
-                        @PathVariable String patientId,
                         @Valid @RequestBody PatientDto patientDto) {
-                validatePatientId(patientId);
-                PatientDto updated = patientService.updatePatient(patientId, patientDto);
+                PatientDto updated = patientService.updatePatient(patientDto);
                 if (updated == null) {
-                        throw new ResourceNotFoundException("Patient not found with id: " + patientId);
+                        throw new ResourceNotFoundException("Patient not found with id: " + patientDto.getPatientId());
                 }
                 ServiceApiResponse<PatientDto> response = new ServiceApiResponse<>(
                                 "success",
