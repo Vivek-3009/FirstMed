@@ -13,8 +13,6 @@ import com.vivek.firstmed.patient_service.exception.ResourceNotFoundException;
 import com.vivek.firstmed.patient_service.repository.PatientRepository;
 import com.vivek.firstmed.patient_service.util.PatientMapperUtil;
 
-
-
 @Service
 public class PatientServiceImpl implements PatientService {
 
@@ -49,10 +47,14 @@ public class PatientServiceImpl implements PatientService {
 
     @Transactional(readOnly = true)
     public List<PatientDto> getAllPatients() {
-        return patientRepository.findAll()
+        List<PatientDto> patients = patientRepository.findAll()
                 .stream()
                 .map(patientMapperUtil::entityToDto)
                 .toList();
+        if (patients.isEmpty()) {
+            throw new ResourceNotFoundException("No patients found.");
+        }
+        return patients;
     }
 
     @Transactional
@@ -68,7 +70,8 @@ public class PatientServiceImpl implements PatientService {
                     Patient updated = patientRepository.save(existingPatient);
                     return patientMapperUtil.entityToDto(updated);
                 })
-                .orElseThrow(() -> new ResourceNotFoundException("Patient not found with ID: " + patientDto.getPatientId()));
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("Patient not found with ID: " + patientDto.getPatientId()));
     }
 
     @Transactional
@@ -84,7 +87,7 @@ public class PatientServiceImpl implements PatientService {
         Patient primaryPatient = patientRepository.findById(primaryPatientId)
                 .orElseThrow(
                         () -> new ResourceNotFoundException("Primary patient not found with ID: " + primaryPatientId));
-        if(primaryPatient.getPrimaryPatient() != null) {
+        if (primaryPatient.getPrimaryPatient() != null) {
             throw new IllegalArgumentException("Cannot add family member to a family member.");
         }
         String newId = idGeneratorService.generatePatientId();

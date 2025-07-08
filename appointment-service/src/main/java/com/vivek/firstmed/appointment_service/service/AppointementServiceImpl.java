@@ -100,14 +100,19 @@ public class AppointementServiceImpl implements AppointmentService {
                     Appointment updatedAppointment = appointmentRepository.save(existingAppointment);
                     return appointmentMapperUtil.entityToDto(updatedAppointment);
                 })
-                .orElseThrow(() -> new ResourceNotFoundException("Appointment not found with ID: " + rescheduleAppointmentDto.getAppointmentId()));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Appointment not found with ID: " + rescheduleAppointmentDto.getAppointmentId()));
 
     }
-
-    @Override
+    @Transactional(readOnly = true)
     public List<AppointmentDto> getAllAppointments() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAllAppointments'");
+        List<AppointmentDto> appointments = appointmentRepository.findAll().stream()
+                .map(appointmentMapperUtil::entityToDto)
+                .toList();
+        if (appointments.isEmpty()) {
+            throw new ResourceNotFoundException("No appointments found");
+        }
+        return appointments;
     }
 
     @Override

@@ -64,9 +64,6 @@ public class DoctorController {
     public ResponseEntity<ServiceApiResponse<DoctorDto>> getDoctorById(@PathVariable String doctorId) {
         validateDoctorId(doctorId);
         DoctorDto doctorDto = doctorService.getDoctorById(doctorId);
-        if (doctorDto == null) {
-            throw new ResourceNotFoundException("Doctor not found with ID: " + doctorId);
-        }
         ServiceApiResponse<DoctorDto> response = new ServiceApiResponse<>(
                 "success",
                 "Doctor retrieved successfully",
@@ -120,9 +117,6 @@ public class DoctorController {
     @GetMapping
     public ResponseEntity<ServiceApiResponse<Iterable<DoctorDto>>> getAllDoctors() {
         List<DoctorDto> doctors = doctorService.getAllDoctors();
-        if (doctors.isEmpty()) {
-            throw new ResourceNotFoundException("No doctors found");
-        }
         ServiceApiResponse<Iterable<DoctorDto>> response = new ServiceApiResponse<>(
                 "success",
                 "Doctors retrieved successfully",
@@ -139,9 +133,6 @@ public class DoctorController {
     public ResponseEntity<ServiceApiResponse<List<DoctorDto>>> getDoctorsBySpecialization(
             @PathVariable String specialization) {
         List<DoctorDto> doctors = doctorService.getDoctorsBySpecialization(specialization);
-        if (doctors.isEmpty()) {
-            throw new ResourceNotFoundException("No doctors found with specialization: " + specialization);
-        }
         ServiceApiResponse<List<DoctorDto>> response = new ServiceApiResponse<>(
                 "success",
                 "Doctors retrieved successfully in specialization: " + specialization,
@@ -158,9 +149,6 @@ public class DoctorController {
     public ResponseEntity<ServiceApiResponse<List<DoctorDto>>> getDoctorsByLocation(
             @PathVariable String location) {
         List<DoctorDto> doctors = doctorService.getDoctorsByLocation(location);
-        if (doctors.isEmpty()) {
-            throw new ResourceNotFoundException("No doctors found in location: " + location);
-        }
         ServiceApiResponse<List<DoctorDto>> response = new ServiceApiResponse<>(
                 "success",
                 "Doctors retrieved successfully in location: " + location,

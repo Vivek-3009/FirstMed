@@ -53,8 +53,8 @@ public class HealthRecordServiceImpl implements HealthRecordService {
     }
 
     @Transactional
-    public HealthRecordDto updateHealthRecord(String healthRecordId, HealthRecordDto healthRecordDto) {
-        return healthRecordRepository.findById(healthRecordId)
+    public HealthRecordDto updateHealthRecord(HealthRecordDto healthRecordDto) {
+        return healthRecordRepository.findById(healthRecordDto.getHealthRecordId())
                 .map(existingRecord -> {
                     existingRecord.setBloodType(healthRecordDto.getBloodType());
                     existingRecord.setAllergies(healthRecordDto.getAllergies());
@@ -65,7 +65,7 @@ public class HealthRecordServiceImpl implements HealthRecordService {
                     HealthRecord updated = healthRecordRepository.save(existingRecord);
                     return healthRecordMapperUtil.entityToDto(updated);
                 })
-                .orElseThrow(() -> new ResourceNotFoundException("Health record not found with ID: " + healthRecordId));
+                .orElseThrow(() -> new ResourceNotFoundException("Health record not found with ID: " + healthRecordDto.getHealthRecordId()));
     }
 
     @Transactional

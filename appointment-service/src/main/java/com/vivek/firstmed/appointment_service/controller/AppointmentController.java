@@ -1,6 +1,5 @@
-// package com.vivek.firstmed.doctor_service.controller;
+// package com.vivek.firstmed.appointment_service.controller;
 
-// import static com.vivek.firstmed.doctor_service.util.ValidationUtils.validateDoctorId;
 
 // import java.util.List;
 
@@ -16,10 +15,6 @@
 // import org.springframework.web.bind.annotation.RequestMapping;
 // import org.springframework.web.bind.annotation.RestController;
 
-// import com.vivek.firstmed.doctor_service.dto.DoctorDto;
-// import com.vivek.firstmed.doctor_service.dto.ServiceApiResponse;
-// import com.vivek.firstmed.doctor_service.exception.ResourceNotFoundException;
-// import com.vivek.firstmed.doctor_service.service.DoctorService;
 
 // import io.swagger.v3.oas.annotations.Operation;
 // import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -31,7 +26,7 @@
 // @RequestMapping("/api/doctors")
 // @Tag(name = "Doctor", description = "Doctor management APIs")
 // @Validated
-// public class DoctorController {
+// public class AppointmentController {
 
 //     private final DoctorService doctorService;
 

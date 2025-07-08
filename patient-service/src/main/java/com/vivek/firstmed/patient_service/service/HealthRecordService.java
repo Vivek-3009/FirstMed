@@ -7,7 +7,7 @@ import com.vivek.firstmed.patient_service.dto.HealthRecordDto;
 public interface HealthRecordService {
     public HealthRecordDto createHealthRecord(HealthRecordDto healthRecordDto);
     public HealthRecordDto getHealthRecordById(String healthRecordId);
-    public HealthRecordDto updateHealthRecord(String healthRecordId, HealthRecordDto healthRecordDto);
+    public HealthRecordDto updateHealthRecord(HealthRecordDto healthRecordDto);
     public List<HealthRecordDto> getAllHealthRecords();
     public void deleteHealthRecord(String healthRecordId);
 

@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.vivek.firstmed.patient_service.dto.PatientDto;
 import com.vivek.firstmed.patient_service.dto.ServiceApiResponse;
-import com.vivek.firstmed.patient_service.exception.ResourceNotFoundException;
 import com.vivek.firstmed.patient_service.service.PatientService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -66,9 +65,6 @@ public class PatientController {
         public ResponseEntity<ServiceApiResponse<PatientDto>> getPatientById(@PathVariable String patientId) {
                 validatePatientId(patientId);
                 PatientDto patient = patientService.getPatientById(patientId);
-                if (patient == null) {
-                        throw new ResourceNotFoundException("Patient not found with id: " + patientId);
-                }
                 ServiceApiResponse<PatientDto> response = new ServiceApiResponse<>(
                                 "success",
                                 "Patient found",
@@ -86,9 +82,6 @@ public class PatientController {
         public ResponseEntity<ServiceApiResponse<PatientDto>> updatePatient(
                         @Valid @RequestBody PatientDto patientDto) {
                 PatientDto updated = patientService.updatePatient(patientDto);
-                if (updated == null) {
-                        throw new ResourceNotFoundException("Patient not found with id: " + patientDto.getPatientId());
-                }
                 ServiceApiResponse<PatientDto> response = new ServiceApiResponse<>(
                                 "success",
                                 "Patient updated successfully",
@@ -121,9 +114,6 @@ public class PatientController {
         @GetMapping
         public ResponseEntity<ServiceApiResponse<List<PatientDto>>> getAllPatients() {
                 List<PatientDto> patients = patientService.getAllPatients();
-                if (patients.isEmpty()) {
-                        throw new ResourceNotFoundException("No patients found");
-                }
                 ServiceApiResponse<List<PatientDto>> response = new ServiceApiResponse<>(
                                 "success",
                                 "All patients fetched",
