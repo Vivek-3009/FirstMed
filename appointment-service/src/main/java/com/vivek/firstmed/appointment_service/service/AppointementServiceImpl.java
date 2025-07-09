@@ -115,22 +115,33 @@ public class AppointementServiceImpl implements AppointmentService {
         return appointments;
     }
 
-    @Override
+    @Transactional(readOnly = true)
     public List<AppointmentDto> getAppointmentByPatientId(String patientId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAppointmentByPatientId'");
+        List<AppointmentDto> appointments = appointmentRepository.findByPatientPatientId(patientId).stream()
+                .map(appointmentMapperUtil::entityToDto)
+                .toList();
+        if (appointments.isEmpty()) {
+            throw new ResourceNotFoundException("No appointments found for patient with ID: " + patientId);
+        }
+        return appointments;
     }
 
     @Override
     public List<AppointmentDto> getAppointmentByDoctorId(String doctorId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAppointmentByDoctorId'");
+        List<AppointmentDto> appointments = appointmentRepository.findByDocotorDocotorId(doctorId).stream().
+                map(appointmentMapperUtil::entityToDto)
+                .toList();
+        if (appointments.isEmpty()) {
+            throw new ResourceNotFoundException("No appointments found for doctor with ID: " + doctorId);
+        }
+        return appointments;
     }
 
     @Override
     public List<AppointmentDto> getAppointmentByDate(String date) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAppointmentByDate'");
+        LocalDate appointmentDate = LocalDate.parse(date);
+        List<AppointmentDto> appointments = appointmentRepository.(appointmentDate).stream()
+                                                .map(appointmentMapperUtil::entityToDto).toList();
     }
 
     @Override

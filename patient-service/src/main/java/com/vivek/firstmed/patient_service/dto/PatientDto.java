@@ -3,6 +3,8 @@ package com.vivek.firstmed.patient_service.dto;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -36,13 +38,11 @@ public class PatientDto {
 
     @NotNull(message = "Date of birth is required")
     @Past(message = "Date of birth must be in the past")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate dateOfBirth;
 
     @NotBlank(message = "Phone number is required")
-    @Pattern(
-        regexp = "^(\\+91)?[6-9]\\d{9}$",
-        message = "Phone number must be a valid Indian number"
-    )
+    @Pattern(regexp = "^(\\+91)?[6-9]\\d{9}$", message = "Phone number must be a valid Indian number")
     private String phoneNumber;
 
     @Email(message = "Email should be valid")

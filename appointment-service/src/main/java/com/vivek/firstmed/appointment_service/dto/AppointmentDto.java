@@ -3,9 +3,11 @@ package com.vivek.firstmed.appointment_service.dto;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.vivek.firstmed.appointment_service.enums.AppointmentStatus;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -32,12 +34,16 @@ public class AppointmentDto {
 
     @NotNull(message = "Appointment date is required")
     @FutureOrPresent(message = "Appointment date must be today or in the future")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate appointmentDate;
 
     @NotNull(message = "Start time is required")
+    @JsonFormat(pattern = "HH:mm")
+    @FutureOrPresent(message = "Start time must be today or in the future")
     private LocalTime startTime;
 
     @NotNull(message = "End time is required")
+    @JsonFormat(pattern = "HH:mm")
     private LocalTime endTime;
 
     @NotNull(message = "Appointment status is required")
@@ -45,4 +51,24 @@ public class AppointmentDto {
 
     @Valid
     private PrescriptionDto prescription;
+
+    @AssertTrue(message = "End time must be after start time")
+    public boolean isEndTimeAfterStartTime() {
+        if (startTime == null || endTime == null) {
+            return true;
+        }
+        return endTime.isAfter(startTime);
+    }
+
+    @AssertTrue(message = "Appointment time must be in the future if the appointment is today")
+    public boolean isTimeValidForToday() {
+        if (appointmentDate == null || startTime == null) {
+            return true;
+        }
+        if (appointmentDate.isEqual(LocalDate.now())) {
+            return startTime.isAfter(LocalTime.now());
+        }
+        return true;
+    }
+
 }
