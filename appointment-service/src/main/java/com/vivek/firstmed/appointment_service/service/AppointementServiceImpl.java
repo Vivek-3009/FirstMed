@@ -117,7 +117,7 @@ public class AppointementServiceImpl implements AppointmentService {
 
     @Transactional(readOnly = true)
     public List<AppointmentDto> getAppointmentByPatientId(String patientId) {
-        List<AppointmentDto> appointments = appointmentRepository.findByPatientPatientId(patientId).stream()
+        List<AppointmentDto> appointments = appointmentRepository.findByPatientId(patientId).stream()
                 .map(appointmentMapperUtil::entityToDto)
                 .toList();
         if (appointments.isEmpty()) {
@@ -126,9 +126,9 @@ public class AppointementServiceImpl implements AppointmentService {
         return appointments;
     }
 
-    @Override
+    @Transactional(readOnly = true)
     public List<AppointmentDto> getAppointmentByDoctorId(String doctorId) {
-        List<AppointmentDto> appointments = appointmentRepository.findByDocotorDocotorId(doctorId).stream().
+        List<AppointmentDto> appointments = appointmentRepository.findByDocotorId(doctorId).stream().
                 map(appointmentMapperUtil::entityToDto)
                 .toList();
         if (appointments.isEmpty()) {
@@ -137,35 +137,68 @@ public class AppointementServiceImpl implements AppointmentService {
         return appointments;
     }
 
-    @Override
+    @Transactional(readOnly = true)
     public List<AppointmentDto> getAppointmentByDate(String date) {
         LocalDate appointmentDate = LocalDate.parse(date);
-        List<AppointmentDto> appointments = appointmentRepository.(appointmentDate).stream()
+        List<AppointmentDto> appointments = appointmentRepository.findByAppointmentDate(appointmentDate).stream()
                                                 .map(appointmentMapperUtil::entityToDto).toList();
+        if (appointments.isEmpty()) {
+            throw new ResourceNotFoundException("No appointments found for date: " + date);
+        }
+        return appointments;
     }
 
-    @Override
+    @Transactional(readOnly = true)
     public List<AppointmentDto> getAppointmentByStatus(String status) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAppointmentByStatus'");
+        AppointmentStatus appointmentStatus = AppointmentStatus.valueOf(status.toUpperCase());
+        List<AppointmentDto> appointments = appointmentRepository.findByStatus(appointmentStatus).stream()
+                .map(appointmentMapperUtil::entityToDto)
+                .toList();
+        if (appointments.isEmpty()) {
+            throw new ResourceNotFoundException("No appointments found with status: " + status);
+        }
+        return appointments;
     }
 
-    @Override
+    @Transactional(readOnly = true)
     public List<AppointmentDto> getAppointmentByDoctorAndDate(String doctorId, String date) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAppointmentByDoctorAndDate'");
+        LocalDate appointmentDate = LocalDate.parse(date);
+        List<AppointmentDto> appointments = appointmentRepository.findByDocotorIdAndAppointmentDate(doctorId, appointmentDate).stream()
+                .map(appointmentMapperUtil::entityToDto)
+                .toList();
+        if (appointments.isEmpty()) {
+            throw new ResourceNotFoundException("No appointments found for doctor with ID: " + doctorId + " on date: " + date);
+        }
+        return appointments;
     }
 
-    @Override
+    @Transactional(readOnly = true)
     public List<AppointmentDto> getAppointmentByPatientAndDate(String patientId, String date) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAppointmentByPatientAndDate'");
+        LocalDate appointmentDate = LocalDate.parse(date);
+        List<AppointmentDto> appointments = appointmentRepository.findByPatientIdAndAppointmentDate(patientId, appointmentDate).stream()
+                .map(appointmentMapperUtil::entityToDto)
+                .toList();
+        if (appointments.isEmpty()) {
+            throw new ResourceNotFoundException("No appointments found for patient with ID: " + patientId + " on date: " + date);
+        }
+        return appointments;
     }
 
-    @Override
+    @Transactional
     public AppointmentDto rescheduleAppointment(String appointmentId, String newDate, String newTime) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'rescheduleAppointment'");
+        LocalDate appointmentDate = LocalDate.parse(newDate);
+        LocalTime appointmentTime = LocalTime.parse(newTime);
+
+        return appointmentRepository.findById(appointmentId)
+                .map(existingAppointment -> {
+                    existingAppointment.setAppointmentDate(appointmentDate);
+                    existingAppointment.setStartTime(appointmentTime);
+                    existingAppointment.setEndTime(appointmentTime.plusHours(1)); // Assuming 1 hour appointment duration
+                    existingAppointment.setStatus(AppointmentStatus.RESCHEDULED);
+                    Appointment updatedAppointment = appointmentRepository.save(existingAppointment);
+                    return appointmentMapperUtil.entityToDto(updatedAppointment);
+                })
+                .orElseThrow(() -> new ResourceNotFoundException("Appointment not found with ID: " + appointmentId));
     }
 
 }

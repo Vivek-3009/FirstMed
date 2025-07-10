@@ -14,12 +14,13 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import lombok.Builder.Default;
 
 @Data
 public class AppointmentDto {
 
     @Size(min = 5, max = 10, message = "Appointment ID must be between 5 and 10 characters")
-    @Pattern(regexp = "^A\\d{4,}$", message = "Appointment ID must start with 'D' followed by at least 4 digits")
+    @Pattern(regexp = "^A\\d{4,}$", message = "Appointment ID must start with 'A' followed by at least 4 digits")
     private String appointmentId;
 
     @NotBlank(message = "Patient ID is required")
@@ -46,8 +47,7 @@ public class AppointmentDto {
     @JsonFormat(pattern = "HH:mm")
     private LocalTime endTime;
 
-    @NotNull(message = "Appointment status is required")
-    private AppointmentStatus status;
+    private AppointmentStatus status = AppointmentStatus.PENDING;
 
     @Valid
     private PrescriptionDto prescription;
