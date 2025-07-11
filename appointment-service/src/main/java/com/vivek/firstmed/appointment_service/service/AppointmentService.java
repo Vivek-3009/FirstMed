@@ -5,7 +5,7 @@ import java.util.List;
 import com.vivek.firstmed.appointment_service.dto.AppointmentDto;
 
 public interface AppointmentService {
-    AppointmentDto addAppointment(AppointmentDto appointmentDto);
+    AppointmentDto createAppointment(AppointmentDto appointmentDto);
     AppointmentDto getAppointmentById(String appointmentId);
     AppointmentDto updateAppointment(AppointmentDto appointmentDto);
     void deleteAppointment(String appointmentId);

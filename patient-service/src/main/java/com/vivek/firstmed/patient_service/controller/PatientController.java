@@ -78,9 +78,12 @@ public class PatientController {
                         @ApiResponse(responseCode = "400", description = "Invalid Patient ID format"),
                         @ApiResponse(responseCode = "404", description = "Patient not found")
         })
-        @PutMapping
+        @PutMapping("/{patientId}")
         public ResponseEntity<ServiceApiResponse<PatientDto>> updatePatient(
-                        @Valid @RequestBody PatientDto patientDto) {
+                @PathVariable String patientId,
+                @Valid @RequestBody PatientDto patientDto) {
+                validatePatientId(patientId);
+                patientDto.setPatientId(patientId);
                 PatientDto updated = patientService.updatePatient(patientDto);
                 ServiceApiResponse<PatientDto> response = new ServiceApiResponse<>(
                                 "success",

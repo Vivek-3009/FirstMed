@@ -78,9 +78,11 @@ public class PatientHealthRecordController {
         @ApiResponse(responseCode = "400", description = "Invalid input data or health record ID format"),
         @ApiResponse(responseCode = "404", description = "Health record not found")
     })
-    @PutMapping
-    public ResponseEntity<ServiceApiResponse<HealthRecordDto>> updateHealthRecord( @Valid @RequestBody HealthRecordDto healthRecordDto) {
-        validateHealthRecordId(healthRecordDto.getHealthRecordId());
+    @PutMapping("/{healthRecordId}")
+    public ResponseEntity<ServiceApiResponse<HealthRecordDto>> updateHealthRecord(@PathVariable String healthRecordId,
+            @Valid @RequestBody HealthRecordDto healthRecordDto) {   
+        validateHealthRecordId(healthRecordId);
+        healthRecordDto.setHealthRecordId(healthRecordId);
         HealthRecordDto updatedRecord = healthRecordService.updateHealthRecord(healthRecordDto);
         ServiceApiResponse<HealthRecordDto> response = new ServiceApiResponse<>(
                 "success",

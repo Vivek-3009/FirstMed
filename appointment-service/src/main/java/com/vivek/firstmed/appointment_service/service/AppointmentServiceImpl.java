@@ -15,13 +15,13 @@ import com.vivek.firstmed.appointment_service.repository.AppointmentRepository;
 import com.vivek.firstmed.appointment_service.util.AppointmentMapperUtil;
 import com.vivek.firstmed.appointment_service.util.IdGeneratorService;
 
-public class AppointementServiceImpl implements AppointmentService {
+public class AppointmentServiceImpl implements AppointmentService {
 
     private final AppointmentRepository appointmentRepository;
     private final IdGeneratorService idGeneratorService;
     private final AppointmentMapperUtil appointmentMapperUtil;
 
-    public AppointementServiceImpl(AppointmentRepository appointmentRepository,
+    public AppointmentServiceImpl(AppointmentRepository appointmentRepository,
             IdGeneratorService idGeneratorService,
             AppointmentMapperUtil appointmentMapperUtil) {
         this.appointmentRepository = appointmentRepository;
@@ -30,7 +30,7 @@ public class AppointementServiceImpl implements AppointmentService {
     }
 
     @Transactional
-    public AppointmentDto addAppointment(AppointmentDto appointmentDto) {
+    public AppointmentDto createAppointment(AppointmentDto appointmentDto) {
         String newId = idGeneratorService.generateAppointmentId();
         appointmentDto.setAppointmentId(newId);
         Appointment appointment = appointmentMapperUtil.dtoToEntity(appointmentDto);

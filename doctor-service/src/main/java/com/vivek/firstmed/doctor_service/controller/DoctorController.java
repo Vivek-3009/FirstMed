@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.vivek.firstmed.doctor_service.dto.DoctorDto;
 import com.vivek.firstmed.doctor_service.dto.ServiceApiResponse;
-import com.vivek.firstmed.doctor_service.exception.ResourceNotFoundException;
 import com.vivek.firstmed.doctor_service.service.DoctorService;
 
 import io.swagger.v3.oas.annotations.Operation;
