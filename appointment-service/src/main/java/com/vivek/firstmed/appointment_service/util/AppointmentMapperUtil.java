@@ -28,4 +28,12 @@ public class AppointmentMapperUtil {
         }
         return modelMapper.map(appointmentDto, Appointment.class);
     }
+
+    public Appointment notNullFieldDtoToEntity(AppointmentDto appointmentDto, Appointment existingAppointment) {
+        if (appointmentDto == null) {
+            return null;
+        }
+        modelMapper.map(appointmentDto, existingAppointment);
+        return existingAppointment;
+    }
 }

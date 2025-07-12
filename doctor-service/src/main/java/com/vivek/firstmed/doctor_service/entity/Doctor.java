@@ -42,4 +42,7 @@ public class Doctor {
 
     @Column(nullable = false, length = 255)
     private String address;
+    
+    @Column(nullable = false)
+    boolean isDeleted = false;
 }

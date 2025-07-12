@@ -49,9 +49,8 @@ public class AppointmentServiceImpl implements AppointmentService {
     public AppointmentDto updateAppointment(AppointmentDto appointmentDto) {
         return appointmentRepository.findById(appointmentDto.getAppointmentId())
                 .map(existingAppointment -> {
-                    Appointment updatedAppointment = appointmentMapperUtil.dtoToEntity(appointmentDto);
-                    updatedAppointment.setAppointmentId(existingAppointment.getAppointmentId());
-                    Appointment savedAppointment = appointmentRepository.save(updatedAppointment);
+                    existingAppointment = appointmentMapperUtil.notNullFieldDtoToEntity(appointmentDto, existingAppointment);
+                    Appointment savedAppointment = appointmentRepository.save(existingAppointment);
                     return appointmentMapperUtil.entityToDto(savedAppointment);
                 })
                 .orElseThrow(() -> new ResourceNotFoundException(
@@ -60,10 +59,13 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     @Transactional
     public void deleteAppointment(String appointmentId) {
-        if (!appointmentRepository.existsById(appointmentId)) {
-            throw new ResourceNotFoundException("Appointment not found with ID: " + appointmentId);
-        }
-        appointmentRepository.deleteById(appointmentId);
+        appointmentRepository.findById(appointmentId)
+                .map(existingAppointment -> {
+                    existingAppointment.setDeleted(true);
+                    Appointment updatedAppointment = appointmentRepository.save(existingAppointment);
+                    return appointmentMapperUtil.entityToDto(updatedAppointment);
+                })
+                .orElseThrow(() -> new ResourceNotFoundException("Appointment not found with ID: " + appointmentId));
     }
 
     @Transactional
@@ -89,21 +91,6 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     }
 
-    @Transactional
-    public AppointmentDto rescheduleAppointment(RescheduleAppointmentDto rescheduleAppointmentDto) {
-        return appointmentRepository.findById(rescheduleAppointmentDto.getAppointmentId())
-                .map(existingAppointment -> {
-                    existingAppointment.setStatus(AppointmentStatus.RESCHEDULED);
-                    existingAppointment.setAppointmentDate(rescheduleAppointmentDto.getNewAppointmentDate());
-                    existingAppointment.setStartTime(rescheduleAppointmentDto.getNewStartTime());
-                    existingAppointment.setEndTime(rescheduleAppointmentDto.getNewEndTime());
-                    Appointment updatedAppointment = appointmentRepository.save(existingAppointment);
-                    return appointmentMapperUtil.entityToDto(updatedAppointment);
-                })
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Appointment not found with ID: " + rescheduleAppointmentDto.getAppointmentId()));
-
-    }
     @Transactional(readOnly = true)
     public List<AppointmentDto> getAllAppointments() {
         List<AppointmentDto> appointments = appointmentRepository.findAll().stream()
@@ -183,22 +170,35 @@ public class AppointmentServiceImpl implements AppointmentService {
         }
         return appointments;
     }
-
+    
     @Transactional
-    public AppointmentDto rescheduleAppointment(String appointmentId, String newDate, String newTime) {
-        LocalDate appointmentDate = LocalDate.parse(newDate);
-        LocalTime appointmentTime = LocalTime.parse(newTime);
-
-        return appointmentRepository.findById(appointmentId)
+    public AppointmentDto rescheduleAppointment(AppointmentDto appointmentDto) {
+        return appointmentRepository.findById(appointmentDto.getAppointmentId())
                 .map(existingAppointment -> {
-                    existingAppointment.setAppointmentDate(appointmentDate);
-                    existingAppointment.setStartTime(appointmentTime);
-                    existingAppointment.setEndTime(appointmentTime.plusHours(1)); // Assuming 1 hour appointment duration
-                    existingAppointment.setStatus(AppointmentStatus.RESCHEDULED);
+                    appointmentMapperUtil.notNullFieldDtoToEntity(appointmentDto, existingAppointment);
                     Appointment updatedAppointment = appointmentRepository.save(existingAppointment);
                     return appointmentMapperUtil.entityToDto(updatedAppointment);
                 })
-                .orElseThrow(() -> new ResourceNotFoundException("Appointment not found with ID: " + appointmentId));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Appointment not found with ID: " + appointmentDto.getAppointmentId()));
+
     }
+
+    // @Transactional
+    // public AppointmentDto rescheduleAppointment(String appointmentId, String newDate, String newTime) {
+    //     LocalDate appointmentDate = LocalDate.parse(newDate);
+    //     LocalTime appointmentTime = LocalTime.parse(newTime);
+
+    //     return appointmentRepository.findById(appointmentId)
+    //             .map(existingAppointment -> {
+    //                 existingAppointment.setAppointmentDate(appointmentDate);
+    //                 existingAppointment.setStartTime(appointmentTime);
+    //                 existingAppointment.setEndTime(appointmentTime.plusHours(1)); // Assuming 1 hour appointment duration
+    //                 existingAppointment.setStatus(AppointmentStatus.RESCHEDULED);
+    //                 Appointment updatedAppointment = appointmentRepository.save(existingAppointment);
+    //                 return appointmentMapperUtil.entityToDto(updatedAppointment);
+    //             })
+    //             .orElseThrow(() -> new ResourceNotFoundException("Appointment not found with ID: " + appointmentId));
+    // }
 
 }

@@ -3,6 +3,8 @@ package com.vivek.firstmed.appointment_service.dto;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -17,10 +19,10 @@ public class RescheduleAppointmentDto {
     private String appointmentId;
     @NotNull(message = "Appointment date is required")
     @FutureOrPresent(message = "Appointment date must be today or in the future")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate newAppointmentDate;
     @NotNull(message = "Start time is required")
+    @JsonFormat(pattern = "HH:mm")
     private LocalTime newStartTime;
-    @NotNull(message = "End time is required")
-    private LocalTime newEndTime;
 
 }

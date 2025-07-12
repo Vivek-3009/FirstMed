@@ -71,4 +71,7 @@ public class Patient {
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private HealthRecord healthRecord;
+
+    @Column(nullable = false)
+    private boolean isDeleted = false;
 }

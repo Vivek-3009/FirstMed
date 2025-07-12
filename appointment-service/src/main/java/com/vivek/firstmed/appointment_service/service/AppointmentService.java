@@ -18,5 +18,5 @@ public interface AppointmentService {
     List<AppointmentDto> getAppointmentByPatientAndDate(String patientId, String date);
     AppointmentDto confirmAppointment(String appointmentId);
     AppointmentDto cancelAppointment(String appointmentId);
-    AppointmentDto rescheduleAppointment(String appointmentId, String newDate, String newTime);
+    AppointmentDto rescheduleAppointment(AppointmentDto appointmentDto);
 }

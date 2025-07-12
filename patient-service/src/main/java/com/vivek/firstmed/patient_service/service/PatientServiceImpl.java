@@ -76,10 +76,13 @@ public class PatientServiceImpl implements PatientService {
 
     @Transactional
     public void deletePatient(String patientId) {
-        if (!patientRepository.existsById(patientId)) {
-            throw new ResourceNotFoundException("Patient not found with ID: " + patientId);
-        }
-        patientRepository.deleteById(patientId);
+        patientRepository.findById(patientId)
+                .map(existingPatient -> {
+                    existingPatient.setDeleted(true);
+                    Patient updatedPatient = patientRepository.save(existingPatient);
+                    return patientMapperUtil.entityToDto(updatedPatient);
+                })
+                .orElseThrow(() -> new ResourceNotFoundException("Patient not found with ID: " + patientId));
     }
 
     @Transactional

@@ -48,5 +48,9 @@ public class HealthRecord {
     @Column(length = 1000)
     private String medicalHistory;
 
+    @Column(nullable = false)
     private LocalDate lastUpdated;
+
+    @Column(nullable = false)
+    boolean isDeleted = false;
 }

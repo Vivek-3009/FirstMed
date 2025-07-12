@@ -28,27 +28,27 @@ import lombok.NoArgsConstructor;
 public class Appointment {
 
     @Id
-    @Column(name = "appointment_id")
+    @Column(length = 10)
     private String appointmentId;
 
-    @Column(name = "patient_id", nullable = false)
+    @Column(nullable = false, length = 10)
     private String patientId;
 
-    @Column(name = "doctor_id", nullable = false)
+    @Column(nullable = false, length = 10)
     private String doctorId;
 
-    @Column(name = "appointment_date", nullable = false)
+    @Column(nullable = false)
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate appointmentDate;
 
-    @Column(name = "start_time", nullable = false)
+    @Column(nullable = false)
     @JsonFormat(pattern = "HH:mm")
     private LocalTime startTime;
 
-    @Column(name = "end_time", nullable = false)
+    @Column(nullable = false)
     private LocalTime endTime;
 
-    @Column(name = "status", nullable = false)
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private AppointmentStatus status;
 
@@ -56,4 +56,7 @@ public class Appointment {
     @JoinColumn(name = "prescription_id", referencedColumnName = "prescription_id")
     @JsonManagedReference
     private Prescription prescription;
+
+    @Column(name = "is_deleted", nullable = false)
+    boolean isDeleted = false;
 }

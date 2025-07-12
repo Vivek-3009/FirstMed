@@ -70,14 +70,13 @@ public class HealthRecordServiceImpl implements HealthRecordService {
 
     @Transactional
     public void deleteHealthRecord(String healthRecordId) {
-        HealthRecord healthRecord = healthRecordRepository.findById(healthRecordId)
+        healthRecordRepository.findById(healthRecordId)
+                .map(existingRecord -> {
+                    existingRecord.setDeleted(true);
+                    HealthRecord updated = healthRecordRepository.save(existingRecord);
+                    return healthRecordMapperUtil.entityToDto(updated);
+                })
                 .orElseThrow(() -> new ResourceNotFoundException("Health record not found with ID: " + healthRecordId));
-        Patient patient = healthRecord.getPatient();
-        if (patient != null) {
-            patient.setHealthRecord(null);
-            patientRepository.save(patient);
-        }
-        healthRecordRepository.deleteById(healthRecordId);
     }
 
     @Transactional(readOnly = true)

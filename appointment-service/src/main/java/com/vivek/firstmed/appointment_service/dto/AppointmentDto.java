@@ -14,7 +14,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
-import lombok.Builder.Default;
 
 @Data
 public class AppointmentDto {
@@ -43,9 +42,7 @@ public class AppointmentDto {
     @FutureOrPresent(message = "Start time must be today or in the future")
     private LocalTime startTime;
 
-    @NotNull(message = "End time is required")
-    @JsonFormat(pattern = "HH:mm")
-    private LocalTime endTime;
+    private LocalTime endTime = startTime.plusMinutes(15);
 
     private AppointmentStatus status = AppointmentStatus.PENDING;
 
