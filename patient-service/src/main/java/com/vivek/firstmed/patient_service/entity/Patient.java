@@ -3,6 +3,9 @@ package com.vivek.firstmed.patient_service.entity;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
@@ -27,6 +30,8 @@ import lombok.ToString;
 @AllArgsConstructor
 @Entity
 @Table(name = "patients")
+@SQLDelete(sql = "UPDATE patients SET is_deleted = true WHERE patient_id = ?")
+@SQLRestriction("is_deleted = false")
 public class Patient {
 
     @Id

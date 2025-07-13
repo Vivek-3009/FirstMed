@@ -58,14 +58,10 @@ public class DoctorServiceImpl implements DoctorService {
 
     @Transactional
     public void deleteDoctor(String doctorId) {
-        doctorRepository.findById(doctorId)
-                .map(existingDoctor -> {
-                    existingDoctor.setDeleted(true);
-                    Doctor savedDoctor = doctorRepository.save(existingDoctor);
-                    return doctorMapperUtil.entityToDto(savedDoctor);
-                })
-                .orElseThrow(
-                        () -> new ResourceNotFoundException("Doctor not found with ID: " + doctorId));
+        if (!doctorRepository.existsById(doctorId)) {
+            throw new ResourceNotFoundException ("Doctor not found with ID: " + doctorId);
+        }
+        doctorRepository.deleteById(doctorId);
     }
 
     @Transactional(readOnly = true)

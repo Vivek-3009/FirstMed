@@ -13,35 +13,27 @@ public class IdGeneratorService {
     private PatientRepository patientRepository;
     private HealthRecordRepository healthRecordRepository;
 
-    public IdGeneratorService(PatientRepository patientRepository, 
-                              HealthRecordRepository healthRecordRepository) {
+    public IdGeneratorService(PatientRepository patientRepository,
+            HealthRecordRepository healthRecordRepository) {
         this.patientRepository = patientRepository;
         this.healthRecordRepository = healthRecordRepository;
     }
 
     public String generatePatientId() {
-        String lastId = patientRepository.findTopByOrderByPatientIdDesc()
-                .map(Patient::getPatientId)
-                .orElse("P1000");
-
-        if (!lastId.matches("^P\\d+$")) {
-            throw new IllegalStateException("Invalid patient ID format: " + lastId);
-        }
-
-        int num = Integer.parseInt(lastId.substring(1)) + 1;
-        return String.format("P%04d", num);
+        return patientRepository.findTopPatientIdsByOrderByPatientIdsDescIncludingDeleted()
+                .map(lastId -> {
+                    int numericPart = Integer.parseInt(lastId.substring(3));
+                    return "P" + (numericPart + 1);
+                })
+                .orElse("P10001");
     }
 
-    public String generateHealthRecordId(){
-        String lastId = healthRecordRepository.findTopByOrderByHealthRecordIdDesc()
-                .map(HealthRecord::getHealthRecordId)
-                .orElse("HR1000");
-        
-        if(!lastId.matches("^HR\\d+$")) {
-            throw new IllegalStateException("Invalid health record ID format: " + lastId);
-        }
-
-        int num = Integer.parseInt(lastId.substring(3)) + 1;
-        return String.format("HR%04d", num);
+    public String generateHealthRecordId() {
+        return healthRecordRepository.findTopHealthRecordIdsByOrderByHealthRecordIdsDescIncludingDeleted()
+                .map(lastId -> {
+                    int numericPart = Integer.parseInt(lastId.substring(2));
+                    return "HR" + (numericPart + 1);
+                })
+                .orElse("HR10001");
     }
 }

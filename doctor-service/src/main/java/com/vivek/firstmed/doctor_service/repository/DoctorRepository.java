@@ -11,7 +11,9 @@ import com.vivek.firstmed.doctor_service.entity.Doctor;
 
 @Repository
 public interface DoctorRepository extends JpaRepository<Doctor, String> {
-    Optional<Doctor> findTopByOrderByDoctorIdDesc();
+    
+    @Query(value = "SELECT doctor_id FROM doctor ORDER BY doctor_id DESC LIMIT 1", nativeQuery = true)
+    Optional<String> findTopDoctorIdByOrderByDoctorIdDescIncludingDeleted();
 
     Optional<Doctor> findBySpecialization(String specialization);
 

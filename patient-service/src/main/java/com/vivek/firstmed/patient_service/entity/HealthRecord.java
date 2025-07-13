@@ -2,6 +2,9 @@ package com.vivek.firstmed.patient_service.entity;
 
 import java.time.LocalDate;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -18,6 +21,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "patient_health_records")
+@SQLDelete(sql = "UPDATE patient_health_records SET is_deleted = true WHERE health_record_id = ?")
+@SQLRestriction("is_deleted = false")
 public class HealthRecord {
 
     @PrePersist
