@@ -18,21 +18,19 @@ public class IdGeneratorService {
     }
 
     public String generateAppointmentId() {
-        return appointmentRepository.findTopByOrderByAppointmentIdDesc()
-                .map(appointment -> {
-                    String lastId = appointment.getAppointmentId();
-                    int newId = Integer.parseInt(lastId.substring(1)) + 1;
-                    return "A" + newId;
+        return appointmentRepository.findTopAppointmentIdByOrderByAppointmentIdDescIncludingDeleted()
+                .map(lastId -> {
+                    int numericPart = Integer.parseInt(lastId.substring(1));
+                    return "A" + (numericPart + 1);
                 })
                 .orElse("A10001");
     }
 
     public String generatePrescriptionId() {
-        return prescriptionRepository.findTopByOrderByPrescriptionIdDesc()
-                .map(prescription -> {
-                    String lastId = prescription.getPrescriptionId();
-                    int newId = Integer.parseInt(lastId.substring(3)) + 1;
-                    return "PRC" + newId;
+        return prescriptionRepository.findTopPrescriptionIdByOrderByPrescriptionIdDescIncludingDeleted()
+                .map(lastId -> {
+                    int numericPart = Integer.parseInt(lastId.substring(3));
+                    return "PRC" + (numericPart + 1);
                 })
                 .orElse("PRC10001");
     }

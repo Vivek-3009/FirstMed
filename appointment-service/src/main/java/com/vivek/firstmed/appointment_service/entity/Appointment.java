@@ -3,6 +3,9 @@ package com.vivek.firstmed.appointment_service.entity;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.vivek.firstmed.appointment_service.enums.AppointmentStatus;
@@ -25,6 +28,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@SQLDelete(sql = "UPDATE appointments SET is_deleted = true WHERE appointment_id = ?")
+@SQLRestriction("is_deleted = false")
 public class Appointment {
 
     @Id

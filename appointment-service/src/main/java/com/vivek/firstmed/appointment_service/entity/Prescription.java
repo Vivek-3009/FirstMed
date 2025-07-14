@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 import org.springframework.data.annotation.Id;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -18,11 +20,17 @@ import jakarta.persistence.MapKeyColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "prescriptions")
+@SQLDelete(sql = "UPDATE prescriptions SET is_deleted = true WHERE prescription_id = ?")
+@SQLRestriction("is_deleted = false")
 public class Prescription {
 
     @PrePersist

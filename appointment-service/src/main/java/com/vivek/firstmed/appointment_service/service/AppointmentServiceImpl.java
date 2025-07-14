@@ -1,13 +1,11 @@
 package com.vivek.firstmed.appointment_service.service;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 
 import org.springframework.transaction.annotation.Transactional;
 
 import com.vivek.firstmed.appointment_service.dto.AppointmentDto;
-import com.vivek.firstmed.appointment_service.dto.RescheduleAppointmentDto;
 import com.vivek.firstmed.appointment_service.entity.Appointment;
 import com.vivek.firstmed.appointment_service.enums.AppointmentStatus;
 import com.vivek.firstmed.appointment_service.exception.ResourceNotFoundException;
@@ -59,13 +57,10 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     @Transactional
     public void deleteAppointment(String appointmentId) {
-        appointmentRepository.findById(appointmentId)
-                .map(existingAppointment -> {
-                    existingAppointment.setDeleted(true);
-                    Appointment updatedAppointment = appointmentRepository.save(existingAppointment);
-                    return appointmentMapperUtil.entityToDto(updatedAppointment);
-                })
-                .orElseThrow(() -> new ResourceNotFoundException("Appointment not found with ID: " + appointmentId));
+        if(appointmentRepository.existsById(appointmentId)){
+            throw new ResourceNotFoundException("Appointment not found with ID: " + appointmentId);
+        }   
+        appointmentRepository.deleteById(appointmentId);               
     }
 
     @Transactional

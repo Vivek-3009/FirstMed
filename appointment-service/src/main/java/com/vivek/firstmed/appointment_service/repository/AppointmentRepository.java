@@ -4,13 +4,15 @@ import java.time.LocalDate;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import com.vivek.firstmed.appointment_service.entity.Appointment;
 import com.vivek.firstmed.appointment_service.enums.AppointmentStatus;
 
 public interface AppointmentRepository extends JpaRepository<Appointment, String> {
-    
-    Optional<Appointment> findTopByOrderByAppointmentIdDesc();
+
+    @Query(value = "SELECT appointment_id FROM appointments ORDER BY appointment_id DESC LIMIT 1", nativeQuery = true)
+    Optional<String> findTopAppointmentIdByOrderByAppointmentIdDescIncludingDeleted();
 
     Optional<Appointment> findByPatientId(String patientId);
 
