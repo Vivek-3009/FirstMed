@@ -2,8 +2,10 @@ package com.vivek.firstmed.patient_service.controller;
 
 import static com.vivek.firstmed.patient_service.util.ValidationUtils.validatePatientId;
 
-import java.util.List;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -21,6 +23,7 @@ import com.vivek.firstmed.patient_service.dto.ServiceApiResponse;
 import com.vivek.firstmed.patient_service.service.PatientService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -115,9 +118,12 @@ public class PatientController {
                         @ApiResponse(responseCode = "404", description = "No patients found")
         })
         @GetMapping
-        public ResponseEntity<ServiceApiResponse<List<PatientDto>>> getAllPatients() {
-                List<PatientDto> patients = patientService.getAllPatients();
-                ServiceApiResponse<List<PatientDto>> response = new ServiceApiResponse<>(
+        public ResponseEntity<ServiceApiResponse<Page<PatientDto>>> getAllPatients(
+                // @PageableDefault(size = 10, page = 0, sort = "createdAt", direction = Sort.Direction.DESC) 
+                @Parameter(hidden = true)
+                @PageableDefault(size = 10, page = 0, sort = "patientId", direction = Sort.Direction.DESC) Pageable pageable) {
+                Page<PatientDto> patients = patientService.getAllPatients(pageable);
+                ServiceApiResponse<Page<PatientDto>> response = new ServiceApiResponse<>(
                                 "success",
                                 "All patients fetched",
                                 patients);

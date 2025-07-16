@@ -2,8 +2,6 @@ package com.vivek.firstmed.patient_service.service;
 
 import org.springframework.stereotype.Service;
 
-import com.vivek.firstmed.patient_service.entity.HealthRecord;
-import com.vivek.firstmed.patient_service.entity.Patient;
 import com.vivek.firstmed.patient_service.repository.HealthRecordRepository;
 import com.vivek.firstmed.patient_service.repository.PatientRepository;
 

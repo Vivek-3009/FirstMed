@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,11 +48,9 @@ public class PatientServiceImpl implements PatientService {
     }
 
     @Transactional(readOnly = true)
-    public List<PatientDto> getAllPatients() {
-        List<PatientDto> patients = patientRepository.findAll()
-                .stream()
-                .map(patientMapperUtil::entityToDto)
-                .toList();
+    public Page<PatientDto> getAllPatients(Pageable pageable) {
+        Page<PatientDto> patients = patientRepository.findAll(pageable)
+                                    .map(patientMapperUtil::entityToDto);
         if (patients.isEmpty()) {
             throw new ResourceNotFoundException("No patients found.");
         }
