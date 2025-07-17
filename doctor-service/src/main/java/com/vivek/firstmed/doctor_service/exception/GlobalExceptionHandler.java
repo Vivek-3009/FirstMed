@@ -83,8 +83,8 @@ public class GlobalExceptionHandler {
                 return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
         }
 
-        @ExceptionHandler(InvalidFormatException.class)
-        public ResponseEntity<ErrorResponse> handleGenericException(InvalidFormatException ex,
+        @ExceptionHandler(Exception.class)
+        public ResponseEntity<ErrorResponse> handleGenericException(Exception ex,
                         HttpServletRequest request) {
                 ErrorResponse errorResponse = new ErrorResponse(
                                 LocalDateTime.now(),

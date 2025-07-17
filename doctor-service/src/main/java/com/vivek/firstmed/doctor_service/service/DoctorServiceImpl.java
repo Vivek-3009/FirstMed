@@ -1,8 +1,7 @@
 package com.vivek.firstmed.doctor_service.service;
 
-import java.util.List;
-import java.util.Optional;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -59,17 +58,15 @@ public class DoctorServiceImpl implements DoctorService {
     @Transactional
     public void deleteDoctor(String doctorId) {
         if (!doctorRepository.existsById(doctorId)) {
-            throw new ResourceNotFoundException ("Doctor not found with ID: " + doctorId);
+            throw new ResourceNotFoundException("Doctor not found with ID: " + doctorId);
         }
         doctorRepository.deleteById(doctorId);
     }
 
     @Transactional(readOnly = true)
-    public List<DoctorDto> getAllDoctors() {
-        List<DoctorDto> doctors = doctorRepository.findAll()
-                .stream()
-                .map(doctorMapperUtil::entityToDto)
-                .toList();
+    public Page<DoctorDto> getAllDoctors(Pageable pageable) {
+        Page<DoctorDto> doctors = doctorRepository.findAll(pageable)
+                .map(doctorMapperUtil::entityToDto);
         if (doctors.isEmpty()) {
             throw new ResourceNotFoundException("No doctors found");
         }
@@ -77,25 +74,23 @@ public class DoctorServiceImpl implements DoctorService {
     }
 
     @Transactional(readOnly = true)
-    public List<DoctorDto> getDoctorsBySpecialization(String specialization) {
-        Optional<Doctor> doctorOptional = doctorRepository.findBySpecialization(specialization);
-        if (doctorOptional.isPresent()) {
-            Doctor doctor = doctorOptional.get();
-            return List.of(doctorMapperUtil.entityToDto(doctor));
-        } else {
+    public Page<DoctorDto> getDoctorsBySpecialization(Pageable pageable, String specialization) {
+        Page<DoctorDto> doctors = doctorRepository.findBySpecialization(specialization, pageable)
+                .map(doctorMapperUtil::entityToDto);
+        if (doctors.isEmpty()) {
             throw new ResourceNotFoundException("No doctors found with specialization: " + specialization);
         }
+        return doctors;
     }
 
     @Override
-    public List<DoctorDto> getDoctorsByLocation(String location) {
-        Optional<Doctor> doctorOptional = doctorRepository.findByLocation(location);
-        if (doctorOptional.isPresent()) {
-            Doctor doctor = doctorOptional.get();
-            return List.of(doctorMapperUtil.entityToDto(doctor));
-        } else {
+    public Page<DoctorDto> getDoctorsByLocation(Pageable pageable, String location) {
+        Page<DoctorDto> doctors = doctorRepository.findByLocation(location, pageable)
+                .map(doctorMapperUtil::entityToDto);
+        if (doctors.isEmpty()) {
             throw new ResourceNotFoundException("No doctors found in location: " + location);
         }
+        return doctors;
     }
 
 }

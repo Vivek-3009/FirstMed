@@ -1,6 +1,7 @@
 package com.vivek.firstmed.doctor_service.service;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import com.vivek.firstmed.doctor_service.dto.DoctorDto;
 
@@ -9,7 +10,7 @@ public interface DoctorService {
     DoctorDto getDoctorById(String doctorId);
     DoctorDto updateDoctor(DoctorDto doctorDto);
     void deleteDoctor(String doctorId);
-    List<DoctorDto> getAllDoctors();
-    List<DoctorDto> getDoctorsBySpecialization(String specialization);
-    List<DoctorDto> getDoctorsByLocation(String location);
+    Page<DoctorDto> getAllDoctors(Pageable pageable);
+    Page<DoctorDto> getDoctorsBySpecialization(Pageable pageable,String specialization);
+    Page<DoctorDto> getDoctorsByLocation(Pageable pageable,String location);
 }
