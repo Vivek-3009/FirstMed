@@ -1,6 +1,7 @@
 package com.vivek.firstmed.appointment_service.service;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import com.vivek.firstmed.appointment_service.dto.AppointmentDto;
 
@@ -9,13 +10,13 @@ public interface AppointmentService {
     AppointmentDto getAppointmentById(String appointmentId);
     AppointmentDto updateAppointment(AppointmentDto appointmentDto);
     void deleteAppointment(String appointmentId);
-    List<AppointmentDto> getAllAppointments();
-    List<AppointmentDto> getAppointmentByPatientId(String patientId);
-    List<AppointmentDto> getAppointmentByDoctorId(String doctorId);
-    List<AppointmentDto> getAppointmentByDate(String date);
-    List<AppointmentDto> getAppointmentByStatus(String status);
-    List<AppointmentDto> getAppointmentByDoctorAndDate(String doctorId, String date);
-    List<AppointmentDto> getAppointmentByPatientAndDate(String patientId, String date);
+    Page<AppointmentDto> getAllAppointments(Pageable pageable);
+    Page<AppointmentDto> getAppointmentByPatientId(Pageable pageable, String patientId);
+    Page<AppointmentDto> getAppointmentByDoctorId(Pageable pageable, String doctorId);
+    Page<AppointmentDto> getAppointmentByDate(Pageable pageable, String date);
+    Page<AppointmentDto> getAppointmentByStatus(Pageable pageable, String status);
+    Page<AppointmentDto> getAppointmentByDoctorAndDate(Pageable pageable, String doctorId, String date);
+    Page<AppointmentDto> getAppointmentByPatientAndDate(Pageable pageable, String patientId, String date);
     AppointmentDto confirmAppointment(String appointmentId);
     AppointmentDto cancelAppointment(String appointmentId);
     AppointmentDto rescheduleAppointment(AppointmentDto appointmentDto);

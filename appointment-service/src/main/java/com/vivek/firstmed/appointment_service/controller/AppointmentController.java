@@ -2,8 +2,10 @@ package com.vivek.firstmed.appointment_service.controller;
 
 import static com.vivek.firstmed.appointment_service.util.ValidationUtils.validAppointmentId;
 
-import java.util.List;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -17,11 +19,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.vivek.firstmed.appointment_service.dto.AppointmentDto;
-import com.vivek.firstmed.appointment_service.dto.RescheduleAppointmentDto;
 import com.vivek.firstmed.appointment_service.dto.ServiceApiResponse;
 import com.vivek.firstmed.appointment_service.service.AppointmentService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -109,14 +111,15 @@ public class AppointmentController {
                 return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
         }
 
-        @Operation(summary = "Get all doctors")
+        @Operation(summary = "Get all appointments")
         @ApiResponses(value = {
                         @ApiResponse(responseCode = "200", description = "List of appointment retrieved successfully"),
                         @ApiResponse(responseCode = "404", description = "No appointment found")
         })
-        public ResponseEntity<ServiceApiResponse<List<AppointmentDto>>> getAllAppointment() {
-                List<AppointmentDto> appointments = appointmentService.getAllAppointments();
-                ServiceApiResponse<List<AppointmentDto>> response = new ServiceApiResponse<>(
+        public ResponseEntity<ServiceApiResponse<Page<AppointmentDto>>> getAllAppointment(
+                        @Parameter(hidden = true) @PageableDefault(size = 10, page = 0, sort = "appointmentId", direction = Sort.Direction.DESC) Pageable pageable) {
+                Page<AppointmentDto> appointments = appointmentService.getAllAppointments(pageable);
+                ServiceApiResponse<Page<AppointmentDto>> response = new ServiceApiResponse<>(
                                 "success",
                                 "All appointments retrieved successfully",
                                 appointments);
@@ -130,11 +133,12 @@ public class AppointmentController {
                         @ApiResponse(responseCode = "404", description = "No appointments found for the patient")
         })
         @GetMapping("/patient/{patientId}")
-        public ResponseEntity<ServiceApiResponse<List<AppointmentDto>>> getAppointmentByPatientId(
+        public ResponseEntity<ServiceApiResponse<Page<AppointmentDto>>> getAppointmentByPatientId(
+                        @Parameter(hidden = true) @PageableDefault(size = 10, page = 0, sort = "patientId", direction = Sort.Direction.DESC) Pageable pageable,
                         @PathVariable String patientId) {
                 validAppointmentId(patientId);
-                List<AppointmentDto> appointments = appointmentService.getAppointmentByPatientId(patientId);
-                ServiceApiResponse<List<AppointmentDto>> response = new ServiceApiResponse<>(
+                Page<AppointmentDto> appointments = appointmentService.getAppointmentByPatientId(pageable, patientId);
+                ServiceApiResponse<Page<AppointmentDto>> response = new ServiceApiResponse<>(
                                 "success",
                                 "Appointments for patient retrieved successfully",
                                 appointments);
@@ -148,11 +152,12 @@ public class AppointmentController {
                         @ApiResponse(responseCode = "404", description = "No appointments found for the doctor")
         })
         @GetMapping("/doctor/{doctorId}")
-        public ResponseEntity<ServiceApiResponse<List<AppointmentDto>>> getAppointmentByDoctorId(
+        public ResponseEntity<ServiceApiResponse<Page<AppointmentDto>>> getAppointmentByDoctorId(
+                        @Parameter(hidden = true) @PageableDefault(size = 10, page = 0, sort = "doctorId", direction = Sort.Direction.DESC) Pageable pageable,
                         @PathVariable String doctorId) {
                 validAppointmentId(doctorId);
-                List<AppointmentDto> appointments = appointmentService.getAppointmentByDoctorId(doctorId);
-                ServiceApiResponse<List<AppointmentDto>> response = new ServiceApiResponse<>(
+                Page<AppointmentDto> appointments = appointmentService.getAppointmentByDoctorId(pageable, doctorId);
+                ServiceApiResponse<Page<AppointmentDto>> response = new ServiceApiResponse<>(
                                 "success",
                                 "Appointments for doctor retrieved successfully",
                                 appointments);
@@ -165,10 +170,11 @@ public class AppointmentController {
                         @ApiResponse(responseCode = "404", description = "No appointments found for the date")
         })
         @GetMapping("/date/{date}")
-        public ResponseEntity<ServiceApiResponse<List<AppointmentDto>>> getAppointmentByDate(
+        public ResponseEntity<ServiceApiResponse<Page<AppointmentDto>>> getAppointmentByDate(
+                        @Parameter(hidden = true) @PageableDefault(size = 10, page = 0, sort = "startTime", direction = Sort.Direction.DESC) Pageable pageable,
                         @PathVariable String date) {
-                List<AppointmentDto> appointments = appointmentService.getAppointmentByDate(date);
-                ServiceApiResponse<List<AppointmentDto>> response = new ServiceApiResponse<>(
+                Page<AppointmentDto> appointments = appointmentService.getAppointmentByDate(pageable, date);
+                ServiceApiResponse<Page<AppointmentDto>> response = new ServiceApiResponse<>(
                                 "success",
                                 "Appointments for date retrieved successfully",
                                 appointments);
@@ -181,10 +187,11 @@ public class AppointmentController {
                         @ApiResponse(responseCode = "404", description = "No appointments found for the status")
         })
         @GetMapping("/status/{status}")
-        public ResponseEntity<ServiceApiResponse<List<AppointmentDto>>> getAppointmentByStatus(
+        public ResponseEntity<ServiceApiResponse<Page<AppointmentDto>>> getAppointmentByStatus(
+                        @Parameter(hidden = true) @PageableDefault(size = 10, page = 0, sort = "appointmentId", direction = Sort.Direction.DESC) Pageable pageable,
                         @PathVariable String status) {
-                List<AppointmentDto> appointments = appointmentService.getAppointmentByStatus(status);
-                ServiceApiResponse<List<AppointmentDto>> response = new ServiceApiResponse<>(
+                Page<AppointmentDto> appointments = appointmentService.getAppointmentByStatus(pageable, status);
+                ServiceApiResponse<Page<AppointmentDto>> response = new ServiceApiResponse<>(
                                 "success",
                                 "Appointments for status retrieved successfully",
                                 appointments);
@@ -198,11 +205,13 @@ public class AppointmentController {
                         @ApiResponse(responseCode = "404", description = "No appointments found for the doctor and date")
         })
         @GetMapping("/doctor/{doctorId}/date/{date}")
-        public ResponseEntity<ServiceApiResponse<List<AppointmentDto>>> getAppointmentByDoctorAndDate(
+        public ResponseEntity<ServiceApiResponse<Page<AppointmentDto>>> getAppointmentByDoctorAndDate(
+                        @Parameter(hidden = true) @PageableDefault(size = 10, page = 0, sort = "appointmentDate", direction = Sort.Direction.DESC) Pageable pageable,
                         @PathVariable String doctorId, @PathVariable String date) {
                 validAppointmentId(doctorId);
-                List<AppointmentDto> appointments = appointmentService.getAppointmentByDoctorAndDate(doctorId, date);
-                ServiceApiResponse<List<AppointmentDto>> response = new ServiceApiResponse<>(
+                Page<AppointmentDto> appointments = appointmentService.getAppointmentByDoctorAndDate(pageable, doctorId,
+                                date);
+                ServiceApiResponse<Page<AppointmentDto>> response = new ServiceApiResponse<>(
                                 "success",
                                 "Appointments for doctor and date retrieved successfully",
                                 appointments);
@@ -216,11 +225,12 @@ public class AppointmentController {
                         @ApiResponse(responseCode = "404", description = "No appointments found for the patient and date")
         })
         @GetMapping("/patient/{patientId}/date/{date}")
-        public ResponseEntity<ServiceApiResponse<List<AppointmentDto>>> getAppointmentByPatientAndDate(
+        public ResponseEntity<ServiceApiResponse<Page<AppointmentDto>>> getAppointmentByPatientAndDate(
+                        @Parameter(hidden = true) @PageableDefault(size = 10, page = 0, sort = "appointmentDate", direction = Sort.Direction.DESC) Pageable pageable,
                         @PathVariable String patientId, @PathVariable String date) {
                 validAppointmentId(patientId);
-                List<AppointmentDto> appointments = appointmentService.getAppointmentByPatientAndDate(patientId, date);
-                ServiceApiResponse<List<AppointmentDto>> response = new ServiceApiResponse<>(
+                Page<AppointmentDto> appointments = appointmentService.getAppointmentByPatientAndDate(pageable, patientId, date);
+                ServiceApiResponse<Page<AppointmentDto>> response = new ServiceApiResponse<>(
                                 "success",
                                 "Appointments for patient and date retrieved successfully",
                                 appointments);
@@ -234,7 +244,8 @@ public class AppointmentController {
                         @ApiResponse(responseCode = "404", description = "Appointment not found")
         })
         @PutMapping("/{appointmentId}/confirm")
-        public ResponseEntity<ServiceApiResponse<AppointmentDto>> confirmAppointment(@PathVariable String appointmentId) {
+        public ResponseEntity<ServiceApiResponse<AppointmentDto>> confirmAppointment(
+                        @PathVariable String appointmentId) {
                 validAppointmentId(appointmentId);
                 AppointmentDto confirmedAppointment = appointmentService.confirmAppointment(appointmentId);
                 ServiceApiResponse<AppointmentDto> response = new ServiceApiResponse<>(
@@ -251,7 +262,8 @@ public class AppointmentController {
                         @ApiResponse(responseCode = "404", description = "Appointment not found")
         })
         @PutMapping("/{appointmentId}/cancel")
-        public ResponseEntity<ServiceApiResponse<AppointmentDto>> cancelAppointment(@PathVariable String appointmentId) {
+        public ResponseEntity<ServiceApiResponse<AppointmentDto>> cancelAppointment(
+                        @PathVariable String appointmentId) {
                 validAppointmentId(appointmentId);
                 AppointmentDto cancelledAppointment = appointmentService.cancelAppointment(appointmentId);
                 ServiceApiResponse<AppointmentDto> response = new ServiceApiResponse<>(
@@ -272,14 +284,12 @@ public class AppointmentController {
                         @PathVariable String appointmentId,
                         @RequestBody AppointmentDto appointmentDto) {
                 validAppointmentId(appointmentId);
-                AppointmentDto rescheduledAppointment = appointmentService.rescheduleAppointment(appointmentDto );
+                AppointmentDto rescheduledAppointment = appointmentService.rescheduleAppointment(appointmentDto);
                 ServiceApiResponse<AppointmentDto> response = new ServiceApiResponse<>(
                                 "success",
                                 "Appointment rescheduled successfully",
                                 rescheduledAppointment);
                 return ResponseEntity.ok(response);
         }
-
-
 
 }

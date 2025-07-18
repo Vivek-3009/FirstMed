@@ -1,8 +1,9 @@
 package com.vivek.firstmed.appointment_service.service;
 
 import java.time.LocalDate;
-import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.vivek.firstmed.appointment_service.dto.AppointmentDto;
@@ -47,7 +48,8 @@ public class AppointmentServiceImpl implements AppointmentService {
     public AppointmentDto updateAppointment(AppointmentDto appointmentDto) {
         return appointmentRepository.findById(appointmentDto.getAppointmentId())
                 .map(existingAppointment -> {
-                    existingAppointment = appointmentMapperUtil.notNullFieldDtoToEntity(appointmentDto, existingAppointment);
+                    existingAppointment = appointmentMapperUtil.notNullFieldDtoToEntity(appointmentDto,
+                            existingAppointment);
                     Appointment savedAppointment = appointmentRepository.save(existingAppointment);
                     return appointmentMapperUtil.entityToDto(savedAppointment);
                 })
@@ -57,10 +59,10 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     @Transactional
     public void deleteAppointment(String appointmentId) {
-        if(appointmentRepository.existsById(appointmentId)){
+        if (appointmentRepository.existsById(appointmentId)) {
             throw new ResourceNotFoundException("Appointment not found with ID: " + appointmentId);
-        }   
-        appointmentRepository.deleteById(appointmentId);               
+        }
+        appointmentRepository.deleteById(appointmentId);
     }
 
     @Transactional
@@ -87,10 +89,9 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
 
     @Transactional(readOnly = true)
-    public List<AppointmentDto> getAllAppointments() {
-        List<AppointmentDto> appointments = appointmentRepository.findAll().stream()
-                .map(appointmentMapperUtil::entityToDto)
-                .toList();
+    public Page<AppointmentDto> getAllAppointments(Pageable pageable) {
+        Page<AppointmentDto> appointments = appointmentRepository.findAll(pageable)
+                .map(appointmentMapperUtil::entityToDto);
         if (appointments.isEmpty()) {
             throw new ResourceNotFoundException("No appointments found");
         }
@@ -98,10 +99,9 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
 
     @Transactional(readOnly = true)
-    public List<AppointmentDto> getAppointmentByPatientId(String patientId) {
-        List<AppointmentDto> appointments = appointmentRepository.findByPatientId(patientId).stream()
-                .map(appointmentMapperUtil::entityToDto)
-                .toList();
+    public Page<AppointmentDto> getAppointmentByPatientId(Pageable pageable, String patientId) {
+        Page<AppointmentDto> appointments = appointmentRepository.findByPatientId(patientId, pageable)
+                .map(appointmentMapperUtil::entityToDto);
         if (appointments.isEmpty()) {
             throw new ResourceNotFoundException("No appointments found for patient with ID: " + patientId);
         }
@@ -109,10 +109,9 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
 
     @Transactional(readOnly = true)
-    public List<AppointmentDto> getAppointmentByDoctorId(String doctorId) {
-        List<AppointmentDto> appointments = appointmentRepository.findByDocotorId(doctorId).stream().
-                map(appointmentMapperUtil::entityToDto)
-                .toList();
+    public Page<AppointmentDto> getAppointmentByDoctorId(Pageable pageable, String doctorId) {
+        Page<AppointmentDto> appointments = appointmentRepository.findByDocotorId(doctorId, pageable)
+                .map(appointmentMapperUtil::entityToDto);
         if (appointments.isEmpty()) {
             throw new ResourceNotFoundException("No appointments found for doctor with ID: " + doctorId);
         }
@@ -120,10 +119,10 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
 
     @Transactional(readOnly = true)
-    public List<AppointmentDto> getAppointmentByDate(String date) {
+    public Page<AppointmentDto> getAppointmentByDate(Pageable pageable, String date) {
         LocalDate appointmentDate = LocalDate.parse(date);
-        List<AppointmentDto> appointments = appointmentRepository.findByAppointmentDate(appointmentDate).stream()
-                                                .map(appointmentMapperUtil::entityToDto).toList();
+        Page<AppointmentDto> appointments = appointmentRepository.findByAppointmentDate(appointmentDate, pageable)
+                .map(appointmentMapperUtil::entityToDto);
         if (appointments.isEmpty()) {
             throw new ResourceNotFoundException("No appointments found for date: " + date);
         }
@@ -131,11 +130,10 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
 
     @Transactional(readOnly = true)
-    public List<AppointmentDto> getAppointmentByStatus(String status) {
+    public Page<AppointmentDto> getAppointmentByStatus(Pageable pageable, String status) {
         AppointmentStatus appointmentStatus = AppointmentStatus.valueOf(status.toUpperCase());
-        List<AppointmentDto> appointments = appointmentRepository.findByStatus(appointmentStatus).stream()
-                .map(appointmentMapperUtil::entityToDto)
-                .toList();
+        Page<AppointmentDto> appointments = appointmentRepository.findByStatus(appointmentStatus, pageable)
+                .map(appointmentMapperUtil::entityToDto);
         if (appointments.isEmpty()) {
             throw new ResourceNotFoundException("No appointments found with status: " + status);
         }
@@ -143,29 +141,31 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
 
     @Transactional(readOnly = true)
-    public List<AppointmentDto> getAppointmentByDoctorAndDate(String doctorId, String date) {
+    public Page<AppointmentDto> getAppointmentByDoctorAndDate(Pageable pageable, String doctorId, String date) {
         LocalDate appointmentDate = LocalDate.parse(date);
-        List<AppointmentDto> appointments = appointmentRepository.findByDocotorIdAndAppointmentDate(doctorId, appointmentDate).stream()
-                .map(appointmentMapperUtil::entityToDto)
-                .toList();
+        Page<AppointmentDto> appointments = appointmentRepository
+                .findByDocotorIdAndAppointmentDate(doctorId, appointmentDate, pageable)
+                .map(appointmentMapperUtil::entityToDto);
         if (appointments.isEmpty()) {
-            throw new ResourceNotFoundException("No appointments found for doctor with ID: " + doctorId + " on date: " + date);
+            throw new ResourceNotFoundException(
+                    "No appointments found for doctor with ID: " + doctorId + " on date: " + date);
         }
         return appointments;
     }
 
     @Transactional(readOnly = true)
-    public List<AppointmentDto> getAppointmentByPatientAndDate(String patientId, String date) {
+    public Page<AppointmentDto> getAppointmentByPatientAndDate(Pageable pageable, String patientId, String date) {
         LocalDate appointmentDate = LocalDate.parse(date);
-        List<AppointmentDto> appointments = appointmentRepository.findByPatientIdAndAppointmentDate(patientId, appointmentDate).stream()
-                .map(appointmentMapperUtil::entityToDto)
-                .toList();
+        Page<AppointmentDto> appointments = appointmentRepository
+                .findByPatientIdAndAppointmentDate(patientId, appointmentDate, pageable)
+                .map(appointmentMapperUtil::entityToDto);
         if (appointments.isEmpty()) {
-            throw new ResourceNotFoundException("No appointments found for patient with ID: " + patientId + " on date: " + date);
+            throw new ResourceNotFoundException(
+                    "No appointments found for patient with ID: " + patientId + " on date: " + date);
         }
         return appointments;
     }
-    
+
     @Transactional
     public AppointmentDto rescheduleAppointment(AppointmentDto appointmentDto) {
         return appointmentRepository.findById(appointmentDto.getAppointmentId())
@@ -180,20 +180,24 @@ public class AppointmentServiceImpl implements AppointmentService {
     }
 
     // @Transactional
-    // public AppointmentDto rescheduleAppointment(String appointmentId, String newDate, String newTime) {
-    //     LocalDate appointmentDate = LocalDate.parse(newDate);
-    //     LocalTime appointmentTime = LocalTime.parse(newTime);
+    // public AppointmentDto rescheduleAppointment(String appointmentId, String
+    // newDate, String newTime) {
+    // LocalDate appointmentDate = LocalDate.parse(newDate);
+    // LocalTime appointmentTime = LocalTime.parse(newTime);
 
-    //     return appointmentRepository.findById(appointmentId)
-    //             .map(existingAppointment -> {
-    //                 existingAppointment.setAppointmentDate(appointmentDate);
-    //                 existingAppointment.setStartTime(appointmentTime);
-    //                 existingAppointment.setEndTime(appointmentTime.plusHours(1)); // Assuming 1 hour appointment duration
-    //                 existingAppointment.setStatus(AppointmentStatus.RESCHEDULED);
-    //                 Appointment updatedAppointment = appointmentRepository.save(existingAppointment);
-    //                 return appointmentMapperUtil.entityToDto(updatedAppointment);
-    //             })
-    //             .orElseThrow(() -> new ResourceNotFoundException("Appointment not found with ID: " + appointmentId));
+    // return appointmentRepository.findById(appointmentId)
+    // .map(existingAppointment -> {
+    // existingAppointment.setAppointmentDate(appointmentDate);
+    // existingAppointment.setStartTime(appointmentTime);
+    // existingAppointment.setEndTime(appointmentTime.plusHours(1)); // Assuming 1
+    // hour appointment duration
+    // existingAppointment.setStatus(AppointmentStatus.RESCHEDULED);
+    // Appointment updatedAppointment =
+    // appointmentRepository.save(existingAppointment);
+    // return appointmentMapperUtil.entityToDto(updatedAppointment);
+    // })
+    // .orElseThrow(() -> new ResourceNotFoundException("Appointment not found with
+    // ID: " + appointmentId));
     // }
 
 }

@@ -3,6 +3,8 @@ package com.vivek.firstmed.appointment_service.repository;
 import java.time.LocalDate;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -14,17 +16,16 @@ public interface AppointmentRepository extends JpaRepository<Appointment, String
     @Query(value = "SELECT appointment_id FROM appointments ORDER BY appointment_id DESC LIMIT 1", nativeQuery = true)
     Optional<String> findTopAppointmentIdByOrderByAppointmentIdDescIncludingDeleted();
 
-    Optional<Appointment> findByPatientId(String patientId);
+    Page<Appointment> findByPatientId(String patientId, Pageable pageable);
 
-    Optional<Appointment> findByDocotorId(String doctorId);
+    Page<Appointment> findByDocotorId(String doctorId, Pageable pageable);
 
-    Optional<Appointment> findByAppointmentDate(LocalDate appointmentDate);
+    Page<Appointment> findByAppointmentDate(LocalDate appointmentDate, Pageable pageable);
 
-    Optional<Appointment> findByStatus(AppointmentStatus appointmentStatus);
-    // Optional<Appointment> findByAppointmentDate(String appointmentId);
+    Page<Appointment> findByStatus(AppointmentStatus appointmentStatus, Pageable pageable);
 
-    Optional<Appointment> findByDocotorIdAndAppointmentDate(String doctorId, LocalDate appointmentDate);
+    Page<Appointment> findByDocotorIdAndAppointmentDate(String doctorId, LocalDate appointmentDate, Pageable pageable);
 
-    Optional<Appointment> findByPatientIdAndAppointmentDate(String patientId, LocalDate appointmentDate);
+    Page<Appointment> findByPatientIdAndAppointmentDate(String patientId, LocalDate appointmentDate, Pageable pageable);
     
 }
