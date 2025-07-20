@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.vivek.firstmed.doctor_service.dto.DoctorDto;
 import com.vivek.firstmed.doctor_service.dto.ServiceApiResponse;
+import com.vivek.firstmed.doctor_service.dto.UpdateDoctorDto;
 import com.vivek.firstmed.doctor_service.service.DoctorService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -83,7 +84,7 @@ public class DoctorController {
         @PutMapping("/{doctorId}")
         public ResponseEntity<ServiceApiResponse<DoctorDto>> updateDoctor(
                         @PathVariable String doctorId,
-                        @Valid @RequestBody DoctorDto doctorDto) {
+                        @Valid @RequestBody UpdateDoctorDto doctorDto) {
                 validateDoctorId(doctorId);
                 doctorDto.setDoctorId(doctorId);
                 DoctorDto updatedDoctor = doctorService.updateDoctor(doctorDto);

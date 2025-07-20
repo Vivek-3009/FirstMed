@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.vivek.firstmed.patient_service.enums.Gender;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
@@ -34,7 +35,7 @@ public class PatientDto {
     private String lastName;
 
     @NotBlank(message = "Gender is required")
-    private String gender;
+    private Gender gender;
 
     @NotNull(message = "Date of birth is required")
     @Past(message = "Date of birth must be in the past")

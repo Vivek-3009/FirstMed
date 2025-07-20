@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.vivek.firstmed.patient_service.dto.PatientDto;
+import com.vivek.firstmed.patient_service.dto.UpdatePatientDto;
 import com.vivek.firstmed.patient_service.entity.Patient;
 import com.vivek.firstmed.patient_service.exception.ResourceNotFoundException;
 import com.vivek.firstmed.patient_service.repository.PatientRepository;
@@ -57,15 +58,15 @@ public class PatientServiceImpl implements PatientService {
     }
 
     @Transactional
-    public PatientDto updatePatient(PatientDto patientDto) {
-        return patientRepository.findById(patientDto.getPatientId()).map(
+    public PatientDto updatePatient(UpdatePatientDto updatePatientDto) {
+        return patientRepository.findById(updatePatientDto.getPatientId()).map(
                 existingPatient -> {
-                    existingPatient = patientMapperUtil.notNullFieldDtoToEntity(patientDto, existingPatient);
+                    existingPatient = patientMapperUtil.notNullFieldDtoToEntity(updatePatientDto, existingPatient);
                     Patient updatedPatient = patientRepository.save(existingPatient);
                     return patientMapperUtil.entityToDto(updatedPatient);
                 })
                 .orElseThrow(
-                        () -> new ResourceNotFoundException("Patient not found with ID: " + patientDto.getPatientId()));
+                        () -> new ResourceNotFoundException("Patient not found with ID: " + updatePatientDto.getPatientId()));
     }
     //  @Transactional
     // public PatientDto updatePatient(PatientDto patientDto) {

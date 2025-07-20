@@ -5,8 +5,12 @@ import java.time.LocalDate;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
+import com.vivek.firstmed.doctor_service.enums.Gender;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -30,8 +34,9 @@ public class Doctor {
     @Column(nullable = false, length = 50)
     private String lastName;
 
-    @Column(nullable = false, length = 50)
-    private String gender;
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
 
     @Column(nullable = false)
     private LocalDate dateOfBirth;

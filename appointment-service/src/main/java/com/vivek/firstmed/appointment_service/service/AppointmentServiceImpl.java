@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.vivek.firstmed.appointment_service.dto.AppointmentDto;
+import com.vivek.firstmed.appointment_service.dto.RescheduleAppointmentDto;
+import com.vivek.firstmed.appointment_service.dto.UpdateAppointmentDto;
 import com.vivek.firstmed.appointment_service.entity.Appointment;
 import com.vivek.firstmed.appointment_service.enums.AppointmentStatus;
 import com.vivek.firstmed.appointment_service.exception.ResourceNotFoundException;
@@ -50,16 +52,16 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     @Override
     @Transactional
-    public AppointmentDto updateAppointment(AppointmentDto appointmentDto) {
-        return appointmentRepository.findById(appointmentDto.getAppointmentId())
+    public AppointmentDto updateAppointment(UpdateAppointmentDto updateAppointmentDto) {
+        return appointmentRepository.findById(updateAppointmentDto.getAppointmentId())
                 .map(existingAppointment -> {
-                    existingAppointment = appointmentMapperUtil.notNullFieldDtoToEntity(appointmentDto,
+                    existingAppointment = appointmentMapperUtil.notNullFieldDtoToEntity(updateAppointmentDto,
                             existingAppointment);
                     Appointment updatedAppointment = appointmentRepository.save(existingAppointment);
                     return appointmentMapperUtil.entityToDto(updatedAppointment);
                 })
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Appointment not found with ID: " + appointmentDto.getAppointmentId()));
+                        "Appointment not found with ID: " + updateAppointmentDto.getAppointmentId()));
     }
 
     @Override
@@ -183,15 +185,18 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     @Override
     @Transactional
-    public AppointmentDto rescheduleAppointment(AppointmentDto appointmentDto) {
-        return appointmentRepository.findById(appointmentDto.getAppointmentId())
+    public AppointmentDto rescheduleAppointment(RescheduleAppointmentDto rescheduleAppointmentDto) {
+        return appointmentRepository.findById(rescheduleAppointmentDto.getAppointmentId())
                 .map(existingAppointment -> {
-                    appointmentMapperUtil.notNullFieldDtoToEntity(appointmentDto, existingAppointment);
+                    existingAppointment.setAppointmentDate(rescheduleAppointmentDto.getNewAppointmentDate());
+                    existingAppointment.setStartTime(rescheduleAppointmentDto.getNewStartTime());
+                    existingAppointment.setEndTime(rescheduleAppointmentDto.getNewEndTime());
+                    existingAppointment.setStatus(AppointmentStatus.RESCHEDULED);
                     Appointment updatedAppointment = appointmentRepository.save(existingAppointment);
                     return appointmentMapperUtil.entityToDto(updatedAppointment);
                 })
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Appointment not found with ID: " + appointmentDto.getAppointmentId()));
+                        "Appointment not found with ID: " + rescheduleAppointmentDto.getAppointmentId()));
 
     }
 

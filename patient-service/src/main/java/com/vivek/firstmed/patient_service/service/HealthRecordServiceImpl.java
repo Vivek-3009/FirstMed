@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.vivek.firstmed.patient_service.dto.HealthRecordDto;
+import com.vivek.firstmed.patient_service.dto.UpdateHealthRecordDto;
 import com.vivek.firstmed.patient_service.entity.HealthRecord;
 import com.vivek.firstmed.patient_service.entity.Patient;
 import com.vivek.firstmed.patient_service.exception.ResourceNotFoundException;
@@ -53,14 +54,14 @@ public class HealthRecordServiceImpl implements HealthRecordService {
     }
 
     @Transactional
-    public HealthRecordDto updateHealthRecord(HealthRecordDto healthRecordDto) {
-        return healthRecordRepository.findById(healthRecordDto.getHealthRecordId())
+    public HealthRecordDto updateHealthRecord(UpdateHealthRecordDto updateHealthRecordDto) {
+        return healthRecordRepository.findById(updateHealthRecordDto.getHealthRecordId())
                 .map(existingRecord -> {
-                    existingRecord = healthRecordMapperUtil.notNullFieldDtoToEntity(healthRecordDto, existingRecord);
+                    existingRecord = healthRecordMapperUtil.notNullFieldDtoToEntity(updateHealthRecordDto, existingRecord);
                     HealthRecord updatedHealthRecord = healthRecordRepository.save(existingRecord);
                     return healthRecordMapperUtil.entityToDto(updatedHealthRecord);
                 })
-                .orElseThrow(() -> new ResourceNotFoundException("Health record not found with ID: " + healthRecordDto.getHealthRecordId()));
+                .orElseThrow(() -> new ResourceNotFoundException("Health record not found with ID: " + updateHealthRecordDto.getHealthRecordId()));
     }
     // @Transactional
     // public HealthRecordDto updateHealthRecord(HealthRecordDto healthRecordDto) {

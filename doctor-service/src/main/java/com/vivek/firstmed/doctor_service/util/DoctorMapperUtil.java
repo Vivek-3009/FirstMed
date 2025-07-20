@@ -4,6 +4,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
 import com.vivek.firstmed.doctor_service.dto.DoctorDto;
+import com.vivek.firstmed.doctor_service.dto.UpdateDoctorDto;
 import com.vivek.firstmed.doctor_service.entity.Doctor;
 
 @Component
@@ -29,11 +30,11 @@ public class DoctorMapperUtil {
         return modelMapper.map(doctorDto, Doctor.class);
     }
 
-    public Doctor notNullFieldDtoToEntity(DoctorDto doctorDto, Doctor existingDoctor) {
-        if (doctorDto == null) {
+    public Doctor notNullFieldDtoToEntity(UpdateDoctorDto updateDoctorDto, Doctor existingDoctor) {
+        if (updateDoctorDto == null) {
             return null;
         }
-        modelMapper.map(doctorDto, existingDoctor);
+        modelMapper.map(updateDoctorDto, existingDoctor);
         return existingDoctor;
     }
 }

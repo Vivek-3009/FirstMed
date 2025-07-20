@@ -19,7 +19,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.vivek.firstmed.appointment_service.dto.AppointmentDto;
+import com.vivek.firstmed.appointment_service.dto.RescheduleAppointmentDto;
 import com.vivek.firstmed.appointment_service.dto.ServiceApiResponse;
+import com.vivek.firstmed.appointment_service.dto.UpdateAppointmentDto;
 import com.vivek.firstmed.appointment_service.service.AppointmentService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -83,10 +85,10 @@ public class AppointmentController {
         })
         @PutMapping("/{appointmentId}")
         public ResponseEntity<ServiceApiResponse<AppointmentDto>> updateAppointment(@PathVariable String appointmentId,
-                        @Valid @RequestBody AppointmentDto appointmentDto) {
+                        @Valid @RequestBody UpdateAppointmentDto updateAppointmentDto) {
                 validAppointmentId(appointmentId);
-                appointmentDto.setAppointmentId(appointmentId);
-                AppointmentDto updatedAppointment = appointmentService.updateAppointment(appointmentDto);
+                updateAppointmentDto.setAppointmentId(appointmentId);
+                AppointmentDto updatedAppointment = appointmentService.updateAppointment(updateAppointmentDto);
                 ServiceApiResponse<AppointmentDto> response = new ServiceApiResponse<>(
                                 "success",
                                 "Appointment updated successfully",
@@ -282,9 +284,9 @@ public class AppointmentController {
         @PutMapping("/{appointmentId}/reschedule")
         public ResponseEntity<ServiceApiResponse<AppointmentDto>> rescheduleAppointment(
                         @PathVariable String appointmentId,
-                        @RequestBody AppointmentDto appointmentDto) {
+                        @RequestBody RescheduleAppointmentDto rescheduleAppointmentDto) {
                 validAppointmentId(appointmentId);
-                AppointmentDto rescheduledAppointment = appointmentService.rescheduleAppointment(appointmentDto);
+                AppointmentDto rescheduledAppointment = appointmentService.rescheduleAppointment(rescheduleAppointmentDto);
                 ServiceApiResponse<AppointmentDto> response = new ServiceApiResponse<>(
                                 "success",
                                 "Appointment rescheduled successfully",

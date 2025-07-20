@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.vivek.firstmed.doctor_service.dto.DoctorDto;
+import com.vivek.firstmed.doctor_service.dto.UpdateDoctorDto;
 import com.vivek.firstmed.doctor_service.entity.Doctor;
 import com.vivek.firstmed.doctor_service.exception.ResourceNotFoundException;
 import com.vivek.firstmed.doctor_service.repository.DoctorRepository;
@@ -44,15 +45,15 @@ public class DoctorServiceImpl implements DoctorService {
     }
 
     @Transactional
-    public DoctorDto updateDoctor(DoctorDto doctorDto) {
-        return doctorRepository.findById(doctorDto.getDoctorId())
+    public DoctorDto updateDoctor(UpdateDoctorDto updateDoctorDto) {
+        return doctorRepository.findById(updateDoctorDto.getDoctorId())
                 .map(existingDoctor -> {
-                    existingDoctor = doctorMapperUtil.notNullFieldDtoToEntity(doctorDto, existingDoctor);
+                    existingDoctor = doctorMapperUtil.notNullFieldDtoToEntity(updateDoctorDto, existingDoctor);
                     Doctor updatedDoctor = doctorRepository.save(existingDoctor);
                     return doctorMapperUtil.entityToDto(updatedDoctor);
                 })
                 .orElseThrow(
-                        () -> new ResourceNotFoundException("Doctor not found with ID: " + doctorDto.getDoctorId()));
+                        () -> new ResourceNotFoundException("Doctor not found with ID: " + updateDoctorDto.getDoctorId()));
     }
 
     @Transactional

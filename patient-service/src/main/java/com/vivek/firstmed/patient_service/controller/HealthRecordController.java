@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.vivek.firstmed.patient_service.dto.HealthRecordDto;
 import com.vivek.firstmed.patient_service.dto.ServiceApiResponse;
+import com.vivek.firstmed.patient_service.dto.UpdateHealthRecordDto;
 import com.vivek.firstmed.patient_service.service.HealthRecordService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,11 +33,11 @@ import jakarta.validation.Valid;
 @RequestMapping("/api/health-records")
 @Tag(name = "Health Record", description = "Health Records management APIs")
 @Validated
-public class PatientHealthRecordController {
+public class HealthRecordController {
 
     private final HealthRecordService healthRecordService;
     
-    public PatientHealthRecordController(HealthRecordService healthRecordService) {
+    public HealthRecordController(HealthRecordService healthRecordService) {
         this.healthRecordService = healthRecordService;
     }
     
@@ -80,10 +81,10 @@ public class PatientHealthRecordController {
     })
     @PutMapping("/{healthRecordId}")
     public ResponseEntity<ServiceApiResponse<HealthRecordDto>> updateHealthRecord(@PathVariable String healthRecordId,
-            @Valid @RequestBody HealthRecordDto healthRecordDto) {   
+            @Valid @RequestBody UpdateHealthRecordDto updateHealthRecordDto) {   
         validateHealthRecordId(healthRecordId);
-        healthRecordDto.setHealthRecordId(healthRecordId);
-        HealthRecordDto updatedRecord = healthRecordService.updateHealthRecord(healthRecordDto);
+        updateHealthRecordDto.setHealthRecordId(healthRecordId);
+        HealthRecordDto updatedRecord = healthRecordService.updateHealthRecord(updateHealthRecordDto);
         ServiceApiResponse<HealthRecordDto> response = new ServiceApiResponse<>(
                 "success",
                 "Health record updated successfully",
