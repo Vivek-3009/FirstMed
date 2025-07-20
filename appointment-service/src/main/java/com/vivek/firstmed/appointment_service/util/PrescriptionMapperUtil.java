@@ -29,4 +29,12 @@ public class PrescriptionMapperUtil {
         }
         return modelMapper.map(prescriptionDto, Prescription.class);
     }
+
+    public Prescription notNullFieldDtoToEntity(PrescriptionDto prescriptionDto, Prescription existingPrescription) {
+        if (prescriptionDto == null) {
+            return null;
+        }
+        modelMapper.map(prescriptionDto, existingPrescription);
+        return existingPrescription;
+    }
 }

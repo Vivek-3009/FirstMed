@@ -1,7 +1,6 @@
 package com.vivek.firstmed.patient_service.service;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -61,18 +60,29 @@ public class PatientServiceImpl implements PatientService {
     public PatientDto updatePatient(PatientDto patientDto) {
         return patientRepository.findById(patientDto.getPatientId()).map(
                 existingPatient -> {
-                    existingPatient.setFirstName(patientDto.getFirstName());
-                    existingPatient.setLastName(patientDto.getLastName());
-                    existingPatient.setGender(patientDto.getGender());
-                    existingPatient.setDateOfBirth(patientDto.getDateOfBirth());
-                    existingPatient.setPhoneNumber(patientDto.getPhoneNumber());
-                    existingPatient.setEmail(patientDto.getEmail());
-                    Patient updated = patientRepository.save(existingPatient);
-                    return patientMapperUtil.entityToDto(updated);
+                    existingPatient = patientMapperUtil.notNullFieldDtoToEntity(patientDto, existingPatient);
+                    Patient updatedPatient = patientRepository.save(existingPatient);
+                    return patientMapperUtil.entityToDto(updatedPatient);
                 })
                 .orElseThrow(
                         () -> new ResourceNotFoundException("Patient not found with ID: " + patientDto.getPatientId()));
     }
+    //  @Transactional
+    // public PatientDto updatePatient(PatientDto patientDto) {
+    //     return patientRepository.findById(patientDto.getPatientId()).map(
+    //             existingPatient -> {
+    //                 existingPatient.setFirstName(patientDto.getFirstName());
+    //                 existingPatient.setLastName(patientDto.getLastName());
+    //                 existingPatient.setGender(patientDto.getGender());
+    //                 existingPatient.setDateOfBirth(patientDto.getDateOfBirth());
+    //                 existingPatient.setPhoneNumber(patientDto.getPhoneNumber());
+    //                 existingPatient.setEmail(patientDto.getEmail());
+    //                 Patient updated = patientRepository.save(existingPatient);
+    //                 return patientMapperUtil.entityToDto(updated);
+    //             })
+    //             .orElseThrow(
+    //                     () -> new ResourceNotFoundException("Patient not found with ID: " + patientDto.getPatientId()));
+    // }
 
     @Transactional
     public void deletePatient(String patientId) {

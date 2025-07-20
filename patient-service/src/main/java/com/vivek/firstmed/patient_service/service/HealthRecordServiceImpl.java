@@ -56,17 +56,27 @@ public class HealthRecordServiceImpl implements HealthRecordService {
     public HealthRecordDto updateHealthRecord(HealthRecordDto healthRecordDto) {
         return healthRecordRepository.findById(healthRecordDto.getHealthRecordId())
                 .map(existingRecord -> {
-                    existingRecord.setBloodType(healthRecordDto.getBloodType());
-                    existingRecord.setAllergies(healthRecordDto.getAllergies());
-                    existingRecord.setChronicDiseases(healthRecordDto.getChronicDiseases());
-                    existingRecord.setMedications(healthRecordDto.getMedications());
-                    existingRecord.setMedicalHistory(healthRecordDto.getMedicalHistory());
-                    existingRecord.setLastUpdated(healthRecordDto.getLastUpdated());
-                    HealthRecord updated = healthRecordRepository.save(existingRecord);
-                    return healthRecordMapperUtil.entityToDto(updated);
+                    existingRecord = healthRecordMapperUtil.notNullFieldDtoToEntity(healthRecordDto, existingRecord);
+                    HealthRecord updatedHealthRecord = healthRecordRepository.save(existingRecord);
+                    return healthRecordMapperUtil.entityToDto(updatedHealthRecord);
                 })
                 .orElseThrow(() -> new ResourceNotFoundException("Health record not found with ID: " + healthRecordDto.getHealthRecordId()));
     }
+    // @Transactional
+    // public HealthRecordDto updateHealthRecord(HealthRecordDto healthRecordDto) {
+    //     return healthRecordRepository.findById(healthRecordDto.getHealthRecordId())
+    //             .map(existingRecord -> {
+    //                 existingRecord.setBloodType(healthRecordDto.getBloodType());
+    //                 existingRecord.setAllergies(healthRecordDto.getAllergies());
+    //                 existingRecord.setChronicDiseases(healthRecordDto.getChronicDiseases());
+    //                 existingRecord.setMedications(healthRecordDto.getMedications());
+    //                 existingRecord.setMedicalHistory(healthRecordDto.getMedicalHistory());
+    //                 existingRecord.setLastUpdated(healthRecordDto.getLastUpdated());
+    //                 HealthRecord updated = healthRecordRepository.save(existingRecord);
+    //                 return healthRecordMapperUtil.entityToDto(updated);
+    //             })
+    //             .orElseThrow(() -> new ResourceNotFoundException("Health record not found with ID: " + healthRecordDto.getHealthRecordId()));
+    // }
 
     @Transactional
     public void deleteHealthRecord(String healthRecordId) {

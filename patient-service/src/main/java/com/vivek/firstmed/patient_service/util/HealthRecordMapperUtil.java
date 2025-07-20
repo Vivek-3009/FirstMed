@@ -29,4 +29,12 @@ public class HealthRecordMapperUtil {
         return modelMapper.map(healthRecordDto, HealthRecord.class);
     }
 
+    public HealthRecord notNullFieldDtoToEntity(HealthRecordDto healthRecordDto, HealthRecord existingHealthRecord) {
+        if (healthRecordDto == null) {
+            return null;
+        }
+        modelMapper.map(healthRecordDto, existingHealthRecord);
+        return existingHealthRecord;
+    }
+
 }

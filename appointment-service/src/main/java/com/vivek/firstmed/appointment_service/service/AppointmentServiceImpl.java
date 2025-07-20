@@ -4,6 +4,7 @@ import java.time.LocalDate;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.vivek.firstmed.appointment_service.dto.AppointmentDto;
@@ -14,6 +15,7 @@ import com.vivek.firstmed.appointment_service.repository.AppointmentRepository;
 import com.vivek.firstmed.appointment_service.util.AppointmentMapperUtil;
 import com.vivek.firstmed.appointment_service.util.IdGeneratorService;
 
+@Service
 public class AppointmentServiceImpl implements AppointmentService {
 
     private final AppointmentRepository appointmentRepository;
@@ -28,6 +30,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         this.appointmentMapperUtil = appointmentMapperUtil;
     }
 
+    @Override
     @Transactional
     public AppointmentDto createAppointment(AppointmentDto appointmentDto) {
         String newId = idGeneratorService.generateAppointmentId();
@@ -37,6 +40,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         return appointmentMapperUtil.entityToDto(savedAppointment);
     }
 
+    @Override
     @Transactional(readOnly = true)
     public AppointmentDto getAppointmentById(String appointmentId) {
         return appointmentRepository.findById(appointmentId)
@@ -44,19 +48,21 @@ public class AppointmentServiceImpl implements AppointmentService {
                 .orElseThrow(() -> new ResourceNotFoundException("Appointment not found with ID: " + appointmentId));
     }
 
+    @Override
     @Transactional
     public AppointmentDto updateAppointment(AppointmentDto appointmentDto) {
         return appointmentRepository.findById(appointmentDto.getAppointmentId())
                 .map(existingAppointment -> {
                     existingAppointment = appointmentMapperUtil.notNullFieldDtoToEntity(appointmentDto,
                             existingAppointment);
-                    Appointment savedAppointment = appointmentRepository.save(existingAppointment);
-                    return appointmentMapperUtil.entityToDto(savedAppointment);
+                    Appointment updatedAppointment = appointmentRepository.save(existingAppointment);
+                    return appointmentMapperUtil.entityToDto(updatedAppointment);
                 })
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Appointment not found with ID: " + appointmentDto.getAppointmentId()));
     }
 
+    @Override
     @Transactional
     public void deleteAppointment(String appointmentId) {
         if (appointmentRepository.existsById(appointmentId)) {
@@ -65,6 +71,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         appointmentRepository.deleteById(appointmentId);
     }
 
+    @Override
     @Transactional
     public AppointmentDto confirmAppointment(String appointmentId) {
         return appointmentRepository.findById(appointmentId)
@@ -76,6 +83,7 @@ public class AppointmentServiceImpl implements AppointmentService {
                 .orElseThrow(() -> new ResourceNotFoundException("Appointment not found with ID: " + appointmentId));
     }
 
+    @Override
     @Transactional
     public AppointmentDto cancelAppointment(String appointmentId) {
         return appointmentRepository.findById(appointmentId)
@@ -88,6 +96,7 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     }
 
+    @Override
     @Transactional(readOnly = true)
     public Page<AppointmentDto> getAllAppointments(Pageable pageable) {
         Page<AppointmentDto> appointments = appointmentRepository.findAll(pageable)
@@ -98,6 +107,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         return appointments;
     }
 
+    @Override
     @Transactional(readOnly = true)
     public Page<AppointmentDto> getAppointmentByPatientId(Pageable pageable, String patientId) {
         Page<AppointmentDto> appointments = appointmentRepository.findByPatientId(patientId, pageable)
@@ -108,6 +118,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         return appointments;
     }
 
+    @Override
     @Transactional(readOnly = true)
     public Page<AppointmentDto> getAppointmentByDoctorId(Pageable pageable, String doctorId) {
         Page<AppointmentDto> appointments = appointmentRepository.findByDocotorId(doctorId, pageable)
@@ -118,6 +129,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         return appointments;
     }
 
+    @Override
     @Transactional(readOnly = true)
     public Page<AppointmentDto> getAppointmentByDate(Pageable pageable, String date) {
         LocalDate appointmentDate = LocalDate.parse(date);
@@ -129,6 +141,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         return appointments;
     }
 
+    @Override
     @Transactional(readOnly = true)
     public Page<AppointmentDto> getAppointmentByStatus(Pageable pageable, String status) {
         AppointmentStatus appointmentStatus = AppointmentStatus.valueOf(status.toUpperCase());
@@ -140,6 +153,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         return appointments;
     }
 
+    @Override
     @Transactional(readOnly = true)
     public Page<AppointmentDto> getAppointmentByDoctorAndDate(Pageable pageable, String doctorId, String date) {
         LocalDate appointmentDate = LocalDate.parse(date);
@@ -153,6 +167,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         return appointments;
     }
 
+    @Override
     @Transactional(readOnly = true)
     public Page<AppointmentDto> getAppointmentByPatientAndDate(Pageable pageable, String patientId, String date) {
         LocalDate appointmentDate = LocalDate.parse(date);
@@ -166,6 +181,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         return appointments;
     }
 
+    @Override
     @Transactional
     public AppointmentDto rescheduleAppointment(AppointmentDto appointmentDto) {
         return appointmentRepository.findById(appointmentDto.getAppointmentId())

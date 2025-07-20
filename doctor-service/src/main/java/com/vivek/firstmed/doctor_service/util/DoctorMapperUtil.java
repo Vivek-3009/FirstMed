@@ -28,4 +28,12 @@ public class DoctorMapperUtil {
         }
         return modelMapper.map(doctorDto, Doctor.class);
     }
+
+    public Doctor notNullFieldDtoToEntity(DoctorDto doctorDto, Doctor existingDoctor) {
+        if (doctorDto == null) {
+            return null;
+        }
+        modelMapper.map(doctorDto, existingDoctor);
+        return existingDoctor;
+    }
 }

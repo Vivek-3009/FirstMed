@@ -7,10 +7,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 
 import com.vivek.firstmed.appointment_service.entity.Appointment;
 import com.vivek.firstmed.appointment_service.enums.AppointmentStatus;
 
+@Repository
 public interface AppointmentRepository extends JpaRepository<Appointment, String> {
 
     @Query(value = "SELECT appointment_id FROM appointments ORDER BY appointment_id DESC LIMIT 1", nativeQuery = true)
