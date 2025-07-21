@@ -4,11 +4,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import com.vivek.firstmed.appointment_service.dto.PrescriptionDto;
+import com.vivek.firstmed.appointment_service.dto.UpdatePrescriptionDto;
 
 public interface PrescriptionService {
     PrescriptionDto createPrescription(PrescriptionDto prescriptionDto);
     PrescriptionDto getPrescriptionById(String prescriptionId);
-    PrescriptionDto updatePrescription(PrescriptionDto prescriptionDto);
+    PrescriptionDto updatePrescription(UpdatePrescriptionDto updatePrescriptionDto);
     void deletePrescription(String prescriptionId);
     Page<PrescriptionDto> getAllPrescriptions(Pageable pageable);
     Page<PrescriptionDto> getPrescriptionsByPatientId(Pageable pageable, String patientId);

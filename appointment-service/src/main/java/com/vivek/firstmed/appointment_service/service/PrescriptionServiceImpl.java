@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.vivek.firstmed.appointment_service.dto.PrescriptionDto;
+import com.vivek.firstmed.appointment_service.dto.UpdatePrescriptionDto;
 import com.vivek.firstmed.appointment_service.entity.Prescription;
 import com.vivek.firstmed.appointment_service.repository.PrescriptionRepository;
 import com.vivek.firstmed.appointment_service.util.IdGeneratorService;
@@ -44,14 +45,14 @@ public class PrescriptionServiceImpl implements PrescriptionService {
 
     @Override
     @Transactional
-    public PrescriptionDto updatePrescription(PrescriptionDto prescriptionDto) {
-        return prescriptionRepository.findById(prescriptionDto.getPrescriptionId())
+    public PrescriptionDto updatePrescription(UpdatePrescriptionDto updatePrescriptionDto) {
+        return prescriptionRepository.findById(updatePrescriptionDto.getPrescriptionId())
                 .map(existingPrescription -> {
-                    existingPrescription = prescriptionMapperUtil.notNullFieldDtoToEntity(prescriptionDto, existingPrescription);
+                    existingPrescription = prescriptionMapperUtil.notNullFieldDtoToEntity(updatePrescriptionDto, existingPrescription);
                     Prescription savedPrescription = prescriptionRepository.save(existingPrescription);
                     return prescriptionMapperUtil.entityToDto(savedPrescription);
                 })
-                .orElseThrow(() -> new RuntimeException("Prescription not found with id: " + prescriptionDto.getPrescriptionId()));
+                .orElseThrow(() -> new RuntimeException("Prescription not found with id: " + updatePrescriptionDto.getPrescriptionId()));
     }
 
     @Override
