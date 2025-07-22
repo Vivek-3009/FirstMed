@@ -1,5 +1,7 @@
 package com.vivek.firstmed.appointment_service.service;
 
+import java.time.LocalDate;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -14,9 +16,9 @@ public interface PrescriptionService {
     Page<PrescriptionDto> getAllPrescriptions(Pageable pageable);
     Page<PrescriptionDto> getPrescriptionsByPatientId(Pageable pageable, String patientId);
     Page<PrescriptionDto> getPrescriptionsByDoctorId(Pageable pageable, String doctorId);
-    Page<PrescriptionDto> getPrescriptionsByDate(Pageable pageable, String date);
-    Page<PrescriptionDto> getPrescriptionsByDoctorAndDate(Pageable pageable, String doctorId, String date);
-    Page<PrescriptionDto> getPrescriptionsByPatientAndDate(Pageable pageable, String patientId, String date);
+    Page<PrescriptionDto> getPrescriptionsByAppointmentDate(Pageable pageable, LocalDate appointmentDate);
+    Page<PrescriptionDto> getPrescriptionsByDoctorAndApointmentDate(Pageable pageable, String doctorId, LocalDate apointmentDate);
+    Page<PrescriptionDto> getPrescriptionsByPatientAndApointmentDate(Pageable pageable, String patientId, LocalDate apointmentDate);
     Page<PrescriptionDto> getPrescriptionsByAppointmentId(Pageable pageable, String appointmentId);
     
 }

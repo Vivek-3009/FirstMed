@@ -1,5 +1,7 @@
 package com.vivek.firstmed.appointment_service.service;
 
+import java.time.LocalDate;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
@@ -7,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.vivek.firstmed.appointment_service.dto.PrescriptionDto;
 import com.vivek.firstmed.appointment_service.dto.UpdatePrescriptionDto;
 import com.vivek.firstmed.appointment_service.entity.Prescription;
+import com.vivek.firstmed.appointment_service.exception.ResourceNotFoundException;
 import com.vivek.firstmed.appointment_service.repository.PrescriptionRepository;
 import com.vivek.firstmed.appointment_service.util.IdGeneratorService;
 import com.vivek.firstmed.appointment_service.util.PrescriptionMapperUtil;
@@ -40,7 +43,7 @@ public class PrescriptionServiceImpl implements PrescriptionService {
     public PrescriptionDto getPrescriptionById(String prescriptionId) {
         return prescriptionRepository.findById(prescriptionId)
                 .map(prescriptionMapperUtil::entityToDto)
-                .orElseThrow(() -> new RuntimeException("Prescription not found with id: " + prescriptionId));
+                .orElseThrow(() -> new ResourceNotFoundException("Prescription not found with id: " + prescriptionId));
     }
 
     @Override
@@ -52,54 +55,91 @@ public class PrescriptionServiceImpl implements PrescriptionService {
                     Prescription savedPrescription = prescriptionRepository.save(existingPrescription);
                     return prescriptionMapperUtil.entityToDto(savedPrescription);
                 })
-                .orElseThrow(() -> new RuntimeException("Prescription not found with id: " + updatePrescriptionDto.getPrescriptionId()));
+                .orElseThrow(() -> new ResourceNotFoundException("Prescription not found with id: " + updatePrescriptionDto.getPrescriptionId()));
     }
 
     @Override
+    @Transactional
     public void deletePrescription(String prescriptionId) {
-        // Implementation logic here
+        if (!prescriptionRepository.existsById(prescriptionId)) {
+            throw new ResourceNotFoundException("Prescription not found with id: " + prescriptionId);
+        }
+        prescriptionRepository.deleteById(prescriptionId);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<PrescriptionDto> getAllPrescriptions(Pageable pageable) {
-        // Implementation logic here
-        return null;
+        Page<PrescriptionDto> prescriptions= prescriptionRepository.findAll(pageable)
+                .map(prescriptionMapperUtil::entityToDto);
+        if (prescriptions.isEmpty()) {
+            throw new ResourceNotFoundException("No prescriptions found");
+        }
+        return prescriptions;
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<PrescriptionDto> getPrescriptionsByPatientId(Pageable pageable, String patientId) {
-        // Implementation logic here
-        return null;
+        Page<PrescriptionDto> prescriptions = prescriptionRepository.findByApointmentPatientId(patientId, pageable)
+                .map(prescriptionMapperUtil::entityToDto);
+        if (prescriptions.isEmpty()) {
+            throw new ResourceNotFoundException("No prescriptions found for patient with id: " + patientId);
+        }
+        return prescriptions;
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<PrescriptionDto> getPrescriptionsByDoctorId(Pageable pageable, String doctorId) {
-        // Implementation logic here
-        return null;
+        Page<PrescriptionDto> prescriptions = prescriptionRepository.findByApointmentDoctorId(doctorId, pageable)
+                .map(prescriptionMapperUtil::entityToDto);
+        if (prescriptions.isEmpty()) {
+            throw new ResourceNotFoundException("No prescriptions found for doctor with id: " + doctorId);
+        }
+        return prescriptions;
     }
 
     @Override
-    public Page<PrescriptionDto> getPrescriptionsByDate(Pageable pageable, String date) {
-        // Implementation logic here
-        return null;
+    @Transactional(readOnly = true)
+    public Page<PrescriptionDto> getPrescriptionsByAppointmentDate(Pageable pageable, LocalDate apointmentDate) {
+        Page<PrescriptionDto> prescriptions = prescriptionRepository.findByApointmentAppointmentDate(apointmentDate, pageable)
+                .map(prescriptionMapperUtil::entityToDto);
+        if (prescriptions.isEmpty()) {
+            throw new ResourceNotFoundException("No prescriptions found for apointmentDate: " + apointmentDate);
+        }
+        return prescriptions;
     }
 
     @Override
-    public Page<PrescriptionDto> getPrescriptionsByDoctorAndDate(Pageable pageable, String doctorId, String date) {
-        // Implementation logic here
-        return null;
+    public Page<PrescriptionDto> getPrescriptionsByDoctorAndApointmentDate(Pageable pageable, String doctorId, LocalDate appointmentDate) {
+        Page<PrescriptionDto> prescriptions = prescriptionRepository.findByApointmentDoctorIdAndAppointmentAppointmentDate(doctorId, appointmentDate, pageable);
+        if (prescriptions.isEmpty()) {
+            throw new ResourceNotFoundException("No prescriptions found for doctor with id: " + doctorId + " and appointment date: " + appointmentDate);
+        }
+        return prescriptions;
     }
 
     @Override
-    public Page<PrescriptionDto> getPrescriptionsByPatientAndDate(Pageable pageable, String patientId, String date) {
-        // Implementation logic here
-        return null;
+    @Transactional(readOnly = true)
+    public Page<PrescriptionDto> getPrescriptionsByPatientAndApointmentDate(Pageable pageable, String patientId, LocalDate appointmentDate) {
+        Page<PrescriptionDto> prescriptions = prescriptionRepository.findByApointmentPatientIdAndAppointmentAppointmentDate(patientId, appointmentDate, pageable)
+                .map(prescriptionMapperUtil::entityToDto);
+        if (prescriptions.isEmpty()) {
+            throw new ResourceNotFoundException("No prescriptions found for patient with id: " + patientId + " and appointment date: " + appointmentDate);
+        }
+        return prescriptions;
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<PrescriptionDto> getPrescriptionsByAppointmentId(Pageable pageable, String appointmentId) {
-        // Implementation logic here
-        return null;
+        Page<PrescriptionDto> prescriptions = prescriptionRepository.findByApointmentAppointmentId(appointmentId, pageable)
+                .map(prescriptionMapperUtil::entityToDto);
+        if (prescriptions.isEmpty()) {
+            throw new ResourceNotFoundException("No prescriptions found for appointment with id: " + appointmentId);
+        }
+        return prescriptions;
     }
     
 }

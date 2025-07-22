@@ -30,6 +30,7 @@ public class PrescriptionMapperUtil {
         }
         return modelMapper.map(prescriptionDto, Prescription.class);
     }
+    
 
     public Prescription notNullFieldDtoToEntity(UpdatePrescriptionDto updatePrescriptionDto, Prescription existingPrescription) {
         if (updatePrescriptionDto == null) {
