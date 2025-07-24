@@ -110,7 +110,7 @@ public class AppointmentController {
                                 "success",
                                 "Appointment deleted successfully",
                                 null);
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
+                return ResponseEntity.ok(response);
         }
 
         @Operation(summary = "Get all appointments")
