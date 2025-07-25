@@ -1,6 +1,8 @@
 package com.vivek.firstmed.appointment_service.controller;
 
 import static com.vivek.firstmed.appointment_service.util.ValidationUtils.validAppointmentId;
+import static com.vivek.firstmed.appointment_service.util.ValidationUtils.validDoctorId;
+import static com.vivek.firstmed.appointment_service.util.ValidationUtils.validPatientId;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -138,7 +140,7 @@ public class AppointmentController {
         public ResponseEntity<ServiceApiResponse<Page<AppointmentDto>>> getAppointmentByPatientId(
                         @Parameter(hidden = true) @PageableDefault(size = 10, page = 0, sort = "patientId", direction = Sort.Direction.DESC) Pageable pageable,
                         @PathVariable String patientId) {
-                validAppointmentId(patientId);
+                validPatientId(patientId);
                 Page<AppointmentDto> appointments = appointmentService.getAppointmentByPatientId(pageable, patientId);
                 ServiceApiResponse<Page<AppointmentDto>> response = new ServiceApiResponse<>(
                                 "success",
@@ -157,7 +159,7 @@ public class AppointmentController {
         public ResponseEntity<ServiceApiResponse<Page<AppointmentDto>>> getAppointmentByDoctorId(
                         @Parameter(hidden = true) @PageableDefault(size = 10, page = 0, sort = "doctorId", direction = Sort.Direction.DESC) Pageable pageable,
                         @PathVariable String doctorId) {
-                validAppointmentId(doctorId);
+                validDoctorId(doctorId);
                 Page<AppointmentDto> appointments = appointmentService.getAppointmentByDoctorId(pageable, doctorId);
                 ServiceApiResponse<Page<AppointmentDto>> response = new ServiceApiResponse<>(
                                 "success",
@@ -210,7 +212,7 @@ public class AppointmentController {
         public ResponseEntity<ServiceApiResponse<Page<AppointmentDto>>> getAppointmentByDoctorAndDate(
                         @Parameter(hidden = true) @PageableDefault(size = 10, page = 0, sort = "appointmentDate", direction = Sort.Direction.DESC) Pageable pageable,
                         @PathVariable String doctorId, @PathVariable String date) {
-                validAppointmentId(doctorId);
+                validDoctorId(doctorId);
                 Page<AppointmentDto> appointments = appointmentService.getAppointmentByDoctorAndDate(pageable, doctorId,
                                 date);
                 ServiceApiResponse<Page<AppointmentDto>> response = new ServiceApiResponse<>(
@@ -230,7 +232,7 @@ public class AppointmentController {
         public ResponseEntity<ServiceApiResponse<Page<AppointmentDto>>> getAppointmentByPatientAndDate(
                         @Parameter(hidden = true) @PageableDefault(size = 10, page = 0, sort = "appointmentDate", direction = Sort.Direction.DESC) Pageable pageable,
                         @PathVariable String patientId, @PathVariable String date) {
-                validAppointmentId(patientId);
+                validPatientId(patientId);
                 Page<AppointmentDto> appointments = appointmentService.getAppointmentByPatientAndDate(pageable, patientId, date);
                 ServiceApiResponse<Page<AppointmentDto>> response = new ServiceApiResponse<>(
                                 "success",

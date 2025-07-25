@@ -1,6 +1,10 @@
 package com.vivek.firstmed.appointment_service.controller;
 
+import static com.vivek.firstmed.appointment_service.util.ValidationUtils.validAppointmentId;
+import static com.vivek.firstmed.appointment_service.util.ValidationUtils.validDoctorId;
 import static com.vivek.firstmed.appointment_service.util.ValidationUtils.validPrescriptionId;
+
+import java.time.LocalDate;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -121,6 +125,116 @@ public class PrescriptionController {
     public ResponseEntity<ServiceApiResponse<Page<PrescriptionDto>>> getAllPrescriptions(
             @Parameter(hidden = true) @PageableDefault(size = 10, page = 0, sort = "prescriptionId", direction = Sort.Direction.DESC) Pageable pageable) {
         Page<PrescriptionDto> prescriptions = prescriptionService.getAllPrescriptions(pageable);
+        ServiceApiResponse<Page<PrescriptionDto>> response = new ServiceApiResponse<>(
+                "success",
+                "Prescriptions retrieved successfully",
+                prescriptions);
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "Get all prescriptions by patient ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Prescriptions retrieved successfully"),
+            @ApiResponse(responseCode = "404", description = "No prescriptions found for the patient")
+    })
+    @GetMapping("/patient/{patientId}")
+    public ResponseEntity<ServiceApiResponse<Page<PrescriptionDto>>> getPrescriptionsByPatientId(
+            @Parameter(hidden = true) @PageableDefault(size = 10, page = 0, sort = "prescriptionId", direction = Sort.Direction.DESC) Pageable pageable,
+            @PathVariable String patientId) {
+        validPrescriptionId(patientId);
+        Page<PrescriptionDto> prescriptions = prescriptionService.getPrescriptionsByPatientId(pageable, patientId);
+        ServiceApiResponse<Page<PrescriptionDto>> response = new ServiceApiResponse<>(
+                "success",
+                "Prescriptions retrieved successfully",
+                prescriptions);
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "Get all prescriptions by doctor ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Prescriptions retrieved successfully"),
+            @ApiResponse(responseCode = "404", description = "No prescriptions found for the doctor")
+    })
+    @GetMapping("/doctor/{doctorId}")
+    public ResponseEntity<ServiceApiResponse<Page<PrescriptionDto>>> getPrescriptionsByDoctorId(
+            @Parameter(hidden = true) @PageableDefault(size = 10, page = 0, sort = "prescriptionId", direction = Sort.Direction.DESC) Pageable pageable,
+            @PathVariable String doctorId) {
+        validDoctorId(doctorId);
+        Page<PrescriptionDto> prescriptions = prescriptionService.getPrescriptionsByDoctorId(pageable, doctorId);
+        ServiceApiResponse<Page<PrescriptionDto>> response = new ServiceApiResponse<>(
+                "success",
+                "Prescriptions retrieved successfully",
+                prescriptions);
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "Get all prescriptions by appointment date")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Prescriptions retrieved successfully"),
+            @ApiResponse(responseCode = "404", description = "No prescriptions found for the appointment date")
+    })
+    @GetMapping("/appointment-date/{appointmentDate}")
+    public ResponseEntity<ServiceApiResponse<Page<PrescriptionDto>>> getPrescriptionsByAppointmentDate(
+            @Parameter(hidden = true) @PageableDefault(size = 10, page = 0, sort = "prescriptionId", direction = Sort.Direction.DESC) Pageable pageable,
+            @PathVariable LocalDate appointmentDate) {
+        Page<PrescriptionDto> prescriptions = prescriptionService.getPrescriptionsByAppointmentDate(pageable,
+                appointmentDate);
+        ServiceApiResponse<Page<PrescriptionDto>> response = new ServiceApiResponse<>(
+                "success",
+                "Prescriptions retrieved successfully",
+                prescriptions);
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "Get all prescriptions by doctor and appointment date")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Prescriptions retrieved successfully"),
+            @ApiResponse(responseCode = "404", description = "No prescriptions found for the doctor and appointment date")
+    })
+    @GetMapping("/doctor/{doctorId}/appointment-date/{appointmentDate}")
+    public ResponseEntity<ServiceApiResponse<Page<PrescriptionDto>>> getPrescriptionsByDoctorAndApointmentDate(
+            @Parameter(hidden = true) @PageableDefault(size = 10, page = 0, sort = "prescriptionId", direction = Sort.Direction.DESC) Pageable pageable,
+            @PathVariable String doctorId, @PathVariable LocalDate appointmentDate) {
+        validDoctorId(doctorId);
+        Page<PrescriptionDto> prescriptions = prescriptionService.getPrescriptionsByDoctorAndApointmentDate(pageable,
+                doctorId, appointmentDate);
+        ServiceApiResponse<Page<PrescriptionDto>> response = new ServiceApiResponse<>(
+                "success",
+                "Prescriptions retrieved successfully",
+                prescriptions);
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "Get all prescriptions by patient and appointment date")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Prescriptions retrieved successfully"),
+            @ApiResponse(responseCode = "404", description = "No prescriptions found for the patient and appointment date")
+    })
+    @GetMapping("/patient/{patientId}/appointment-date/{appointmentDate}")
+    public ResponseEntity<ServiceApiResponse<Page<PrescriptionDto>>> getPrescriptionsByPatientAndApointmentDate(
+            @Parameter(hidden = true) @PageableDefault(size = 10, page = 0, sort = "prescriptionId", direction = Sort.Direction.DESC) Pageable pageable,
+            @PathVariable String patientId, @PathVariable LocalDate appointmentDate) {
+        validPrescriptionId(patientId);
+        Page<PrescriptionDto> prescriptions = prescriptionService.getPrescriptionsByPatientAndApointmentDate(pageable,
+                patientId, appointmentDate);
+        ServiceApiResponse<Page<PrescriptionDto>> response = new ServiceApiResponse<>(
+                "success",
+                "Prescriptions retrieved successfully",
+                prescriptions);
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "Get all prescriptions by appointment ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Prescriptions retrieved successfully"),
+            @ApiResponse(responseCode = "404", description = "No prescriptions found for the appointment ID")
+    })
+    @GetMapping("/appointment/{appointmentId}")
+    public ResponseEntity<ServiceApiResponse<Page<PrescriptionDto>>> getPrescriptionsByAppointmentId(
+            @Parameter(hidden = true) @PageableDefault(size = 10, page = 0, sort = "prescriptionId", direction = Sort.Direction.DESC) Pageable pageable,
+            @PathVariable String appointmentId) {
+        validAppointmentId(appointmentId);
+        Page<PrescriptionDto> prescriptions = prescriptionService.getPrescriptionsByAppointmentId(pageable, appointmentId);
         ServiceApiResponse<Page<PrescriptionDto>> response = new ServiceApiResponse<>(
                 "success",
                 "Prescriptions retrieved successfully",
