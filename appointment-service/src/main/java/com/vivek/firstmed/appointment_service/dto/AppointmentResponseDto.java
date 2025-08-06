@@ -11,8 +11,8 @@ import lombok.Data;
 public class AppointmentResponseDto {
 
     private String appointmentId;
-    private PatientDto patientId;
-    private DoctorDto doctorId;
+    private PatientDto patient;
+    private DoctorDto doctor;
     private LocalDate appointmentDate;
     private LocalTime startTime;
     private LocalTime endTime;
