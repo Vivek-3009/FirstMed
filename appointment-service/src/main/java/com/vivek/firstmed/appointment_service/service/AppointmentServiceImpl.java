@@ -7,7 +7,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.vivek.firstmed.appointment_service.client.DoctorClient;
+import com.vivek.firstmed.appointment_service.client.PatientClient;
 import com.vivek.firstmed.appointment_service.dto.AppointmentDto;
+import com.vivek.firstmed.appointment_service.dto.AppointmentResponseDto;
+import com.vivek.firstmed.appointment_service.dto.DoctorDto;
+import com.vivek.firstmed.appointment_service.dto.PatientDto;
 import com.vivek.firstmed.appointment_service.dto.RescheduleAppointmentDto;
 import com.vivek.firstmed.appointment_service.dto.UpdateAppointmentDto;
 import com.vivek.firstmed.appointment_service.entity.Appointment;
@@ -23,42 +28,54 @@ public class AppointmentServiceImpl implements AppointmentService {
     private final AppointmentRepository appointmentRepository;
     private final IdGeneratorService idGeneratorService;
     private final AppointmentMapperUtil appointmentMapperUtil;
+    private final PatientClient patientClient;
+    private final DoctorClient doctorClient;
+
 
     public AppointmentServiceImpl(AppointmentRepository appointmentRepository,
             IdGeneratorService idGeneratorService,
-            AppointmentMapperUtil appointmentMapperUtil) {
+            AppointmentMapperUtil appointmentMapperUtil, PatientClient patientClient,
+            DoctorClient doctorClient) {
         this.appointmentRepository = appointmentRepository;
         this.idGeneratorService = idGeneratorService;
         this.appointmentMapperUtil = appointmentMapperUtil;
+        this.patientClient = patientClient;
+        this.doctorClient = doctorClient;
     }
 
     @Override
     @Transactional
-    public AppointmentDto createAppointment(AppointmentDto appointmentDto) {
+    public AppointmentResponseDto createAppointment(AppointmentDto appointmentDto) {
         String newId = idGeneratorService.generateAppointmentId();
         appointmentDto.setAppointmentId(newId);
         Appointment appointment = appointmentMapperUtil.dtoToEntity(appointmentDto);
         Appointment savedAppointment = appointmentRepository.save(appointment);
-        return appointmentMapperUtil.entityToDto(savedAppointment);
+        PatientDto patientDto = patientClient.getPatientById(appointmentDto.getPatientId());
+        DoctorDto doctorDto = doctorClient.getDoctorById(appointmentDto.getDoctorId());
+        return appointmentMapperUtil.entityToResponseDto(savedAppointment, patientDto, doctorDto);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public AppointmentDto getAppointmentById(String appointmentId) {
-        return appointmentRepository.findById(appointmentId)
-                .map(appointmentMapperUtil::entityToDto)
+    public AppointmentResponseDto getAppointmentById(String appointmentId) {
+        Appointment appointment = appointmentRepository.findById(appointmentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Appointment not found with ID: " + appointmentId));
+        PatientDto patientDto = patientClient.getPatientById(appointment.getPatientId());
+        DoctorDto doctorDto = doctorClient.getDoctorById(appointment.getDoctorId());
+        return appointmentMapperUtil.entityToResponseDto(appointment, patientDto, doctorDto);        
     }
 
     @Override
     @Transactional
-    public AppointmentDto updateAppointment(UpdateAppointmentDto updateAppointmentDto) {
+    public AppointmentResponseDto updateAppointment(UpdateAppointmentDto updateAppointmentDto) {
         return appointmentRepository.findById(updateAppointmentDto.getAppointmentId())
                 .map(existingAppointment -> {
                     existingAppointment = appointmentMapperUtil.notNullFieldDtoToEntity(updateAppointmentDto,
                             existingAppointment);
+                    PatientDto patientDto = patientClient.getPatientById(existingAppointment.getPatientId());
+                    DoctorDto doctorDto = doctorClient.getDoctorById(existingAppointment.getDoctorId());
                     Appointment updatedAppointment = appointmentRepository.save(existingAppointment);
-                    return appointmentMapperUtil.entityToDto(updatedAppointment);
+                    return appointmentMapperUtil.entityToResponseDto(updatedAppointment, patientDto, doctorDto);
                 })
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Appointment not found with ID: " + updateAppointmentDto.getAppointmentId()));
@@ -75,12 +92,14 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     @Override
     @Transactional
-    public AppointmentDto confirmAppointment(String appointmentId) {
+    public AppointmentResponseDto confirmAppointment(String appointmentId) {
         return appointmentRepository.findById(appointmentId)
                 .map(existingAppointment -> {
                     existingAppointment.setStatus(AppointmentStatus.CONFIRMED);
+                    PatientDto patientDto = patientClient.getPatientById(existingAppointment.getPatientId());
+                    DoctorDto doctorDto = doctorClient.getDoctorById(existingAppointment.getDoctorId());
                     Appointment updatedAppointment = appointmentRepository.save(existingAppointment);
-                    return appointmentMapperUtil.entityToDto(updatedAppointment);
+                    return appointmentMapperUtil.entityToResponseDto(updatedAppointment, patientDto, doctorDto);
                 })
                 .orElseThrow(() -> new ResourceNotFoundException("Appointment not found with ID: " + appointmentId));
     }
