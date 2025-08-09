@@ -51,7 +51,13 @@ public class AppointmentServiceImpl implements AppointmentService {
         Appointment appointment = appointmentMapperUtil.dtoToEntity(appointmentDto);
         Appointment savedAppointment = appointmentRepository.save(appointment);
         PatientDto patientDto = patientClient.getPatientById(appointmentDto.getPatientId());
+        if (patientDto == null) {
+            throw new ResourceNotFoundException("Patient not found with ID: " + appointmentDto.getPatientId());
+        }
         DoctorDto doctorDto = doctorClient.getDoctorById(appointmentDto.getDoctorId());
+        if (doctorDto == null) {
+            throw new ResourceNotFoundException("Doctor not found with ID: " + appointmentDto.getDoctorId());
+        }
         return appointmentMapperUtil.entityToResponseDto(savedAppointment, patientDto, doctorDto);
     }
 
@@ -61,7 +67,13 @@ public class AppointmentServiceImpl implements AppointmentService {
         Appointment appointment = appointmentRepository.findById(appointmentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Appointment not found with ID: " + appointmentId));
         PatientDto patientDto = patientClient.getPatientById(appointment.getPatientId());
+        if (patientDto == null) {
+            throw new ResourceNotFoundException("Patient not found with ID: " + appointment.getPatientId());
+        }
         DoctorDto doctorDto = doctorClient.getDoctorById(appointment.getDoctorId());
+        if (doctorDto == null) {
+            throw new ResourceNotFoundException("Doctor not found with ID: " + appointment.getDoctorId());
+        }
         return appointmentMapperUtil.entityToResponseDto(appointment, patientDto, doctorDto);        
     }
 
@@ -73,7 +85,13 @@ public class AppointmentServiceImpl implements AppointmentService {
                     existingAppointment = appointmentMapperUtil.notNullFieldDtoToEntity(updateAppointmentDto,
                             existingAppointment);
                     PatientDto patientDto = patientClient.getPatientById(existingAppointment.getPatientId());
+                    if (patientDto == null) {
+                        throw new ResourceNotFoundException("Patient not found with ID: " + existingAppointment.getPatientId());
+                    }
                     DoctorDto doctorDto = doctorClient.getDoctorById(existingAppointment.getDoctorId());
+                    if (doctorDto == null) {
+                        throw new ResourceNotFoundException("Doctor not found with ID: " + existingAppointment.getDoctorId());
+                    }
                     Appointment updatedAppointment = appointmentRepository.save(existingAppointment);
                     return appointmentMapperUtil.entityToResponseDto(updatedAppointment, patientDto, doctorDto);
                 })
@@ -97,7 +115,13 @@ public class AppointmentServiceImpl implements AppointmentService {
                 .map(existingAppointment -> {
                     existingAppointment.setStatus(AppointmentStatus.CONFIRMED);
                     PatientDto patientDto = patientClient.getPatientById(existingAppointment.getPatientId());
+                    if( patientDto == null) {
+                        throw new ResourceNotFoundException("Patient not found with ID: " + existingAppointment.getPatientId());
+                    }
                     DoctorDto doctorDto = doctorClient.getDoctorById(existingAppointment.getDoctorId());
+                    if( doctorDto == null) {
+                        throw new ResourceNotFoundException("Doctor not found with ID: " + existingAppointment.getDoctorId());
+                    }
                     Appointment updatedAppointment = appointmentRepository.save(existingAppointment);
                     return appointmentMapperUtil.entityToResponseDto(updatedAppointment, patientDto, doctorDto);
                 })
@@ -106,12 +130,20 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     @Override
     @Transactional
-    public AppointmentDto cancelAppointment(String appointmentId) {
+    public AppointmentResponseDto cancelAppointment(String appointmentId) {
         return appointmentRepository.findById(appointmentId)
                 .map(existingAppointment -> {
                     existingAppointment.setStatus(AppointmentStatus.CANCELLED);
                     Appointment updatedAppointment = appointmentRepository.save(existingAppointment);
-                    return appointmentMapperUtil.entityToDto(updatedAppointment);
+                    PatientDto patientDto = patientClient.getPatientById(existingAppointment.getPatientId());
+                    if( patientDto == null) {
+                        throw new ResourceNotFoundException("Patient not found with ID: " + existingAppointment.getPatientId());
+                    }
+                    DoctorDto doctorDto = doctorClient.getDoctorById(existingAppointment.getDoctorId());
+                    if( doctorDto == null) {
+                        throw new ResourceNotFoundException("Doctor not found with ID: " + existingAppointment.getDoctorId());
+                    }
+                    return appointmentMapperUtil.entityToResponseDto(updatedAppointment, patientDto, doctorDto);
                 })
                 .orElseThrow(() -> new ResourceNotFoundException("Appointment not found with ID: " + appointmentId));
 
@@ -119,24 +151,42 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<AppointmentDto> getAllAppointments(Pageable pageable) {
-        Page<AppointmentDto> appointments = appointmentRepository.findAll(pageable)
-                .map(appointmentMapperUtil::entityToDto);
+    public Page<AppointmentResponseDto> getAllAppointments(Pageable pageable) {
+        Page<Appointment> appointments = appointmentRepository.findAll(pageable);
         if (appointments.isEmpty()) {
             throw new ResourceNotFoundException("No appointments found");
         }
-        return appointments;
+        return appointments.map(appointment -> {
+            PatientDto patientDto = patientClient.getPatientById(appointment.getPatientId());
+            if (patientDto == null) {
+                throw new ResourceNotFoundException("Patient not found with ID: " + appointment.getPatientId());
+            }
+            DoctorDto doctorDto = doctorClient.getDoctorById(appointment.getDoctorId());
+            if (doctorDto == null) {
+                throw new ResourceNotFoundException("Doctor not found with ID: " + appointment.getDoctorId());
+            }
+            return appointmentMapperUtil.entityToResponseDto(appointment, patientDto, doctorDto);
+        });
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Page<AppointmentDto> getAppointmentByPatientId(Pageable pageable, String patientId) {
-        Page<AppointmentDto> appointments = appointmentRepository.findByPatientId(patientId, pageable)
-                .map(appointmentMapperUtil::entityToDto);
+    public Page<AppointmentResponseDto> getAppointmentByPatientId(Pageable pageable, String patientId) {
+        Page<Appointment> appointments = appointmentRepository.findByPatientId(patientId, pageable);
         if (appointments.isEmpty()) {
             throw new ResourceNotFoundException("No appointments found for patient with ID: " + patientId);
         }
-        return appointments;
+        return appointments.map(appointment -> {
+            PatientDto patientDto = patientClient.getPatientById(appointment.getPatientId());
+            if (patientDto == null) {
+                throw new ResourceNotFoundException("Patient not found with ID: " + appointment.getPatientId());
+            }
+            DoctorDto doctorDto = doctorClient.getDoctorById(appointment.getDoctorId());
+            if (doctorDto == null) {
+                throw new ResourceNotFoundException("Doctor not found with ID: " + appointment.getDoctorId());
+            }
+            return appointmentMapperUtil.entityToResponseDto(appointment, patientDto, doctorDto);
+        });
     }
 
     @Override
