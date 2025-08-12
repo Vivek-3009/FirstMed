@@ -276,21 +276,30 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<AppointmentDto> getAppointmentByPatientAndDate(Pageable pageable, String patientId, String date) {
+    public Page<AppointmentResponseDto> getAppointmentByPatientAndDate(Pageable pageable, String patientId, String date) {
         LocalDate appointmentDate = LocalDate.parse(date);
-        Page<AppointmentDto> appointments = appointmentRepository
-                .findByPatientIdAndAppointmentDate(patientId, appointmentDate, pageable)
-                .map(appointmentMapperUtil::entityToDto);
+        Page<Appointment> appointments = appointmentRepository
+                .findByPatientIdAndAppointmentDate(patientId, appointmentDate, pageable);
         if (appointments.isEmpty()) {
             throw new ResourceNotFoundException(
                     "No appointments found for patient with ID: " + patientId + " on date: " + date);
         }
-        return appointments;
+        return appointments.map(appointment -> {
+            PatientDto patientDto = patientClient.getPatientById(appointment.getPatientId());
+            if (patientDto == null) {
+                throw new ResourceNotFoundException("Patient not found with ID: " + appointment.getPatientId());
+            }
+            DoctorDto doctorDto = doctorClient.getDoctorById(appointment.getDoctorId());
+            if (doctorDto == null) {
+                throw new ResourceNotFoundException("Doctor not found with ID: " + appointment.getDoctorId());
+            }
+            return appointmentMapperUtil.entityToResponseDto(appointment, patientDto, doctorDto);
+        });
     }
 
     @Override
     @Transactional
-    public AppointmentDto rescheduleAppointment(RescheduleAppointmentDto rescheduleAppointmentDto) {
+    public AppointmentResponseDto rescheduleAppointment(RescheduleAppointmentDto rescheduleAppointmentDto) {
         return appointmentRepository.findById(rescheduleAppointmentDto.getAppointmentId())
                 .map(existingAppointment -> {
                     existingAppointment.setAppointmentDate(rescheduleAppointmentDto.getNewAppointmentDate());
@@ -298,7 +307,15 @@ public class AppointmentServiceImpl implements AppointmentService {
                     existingAppointment.setEndTime(rescheduleAppointmentDto.getNewEndTime());
                     existingAppointment.setStatus(AppointmentStatus.RESCHEDULED);
                     Appointment updatedAppointment = appointmentRepository.save(existingAppointment);
-                    return appointmentMapperUtil.entityToDto(updatedAppointment);
+                    PatientDto patientDto = patientClient.getPatientById(existingAppointment.getPatientId());
+                    if (patientDto == null) {
+                        throw new ResourceNotFoundException("Patient not found with ID: " + existingAppointment.getPatientId());
+                    }
+                    DoctorDto doctorDto = doctorClient.getDoctorById(existingAppointment.getDoctorId());
+                    if (doctorDto == null) {
+                        throw new ResourceNotFoundException("Doctor not found with ID: " + existingAppointment.getDoctorId());
+                    }
+                    return appointmentMapperUtil.entityToResponseDto(updatedAppointment, patientDto, doctorDto);
                 })
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Appointment not found with ID: " + rescheduleAppointmentDto.getAppointmentId()));
