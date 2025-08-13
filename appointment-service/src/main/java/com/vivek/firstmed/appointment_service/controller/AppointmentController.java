@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.vivek.firstmed.appointment_service.dto.AppointmentDto;
+import com.vivek.firstmed.appointment_service.dto.AppointmentResponseDto;
 import com.vivek.firstmed.appointment_service.dto.RescheduleAppointmentDto;
 import com.vivek.firstmed.appointment_service.dto.ServiceApiResponse;
 import com.vivek.firstmed.appointment_service.dto.UpdateAppointmentDto;
@@ -51,10 +52,10 @@ public class AppointmentController {
                         @ApiResponse(responseCode = "400", description = "Invalid input")
         })
         @PostMapping
-        public ResponseEntity<ServiceApiResponse<AppointmentDto>> createAppointment(
+        public ResponseEntity<ServiceApiResponse<AppointmentResponseDto>> createAppointment(
                         @Valid @RequestBody AppointmentDto appointmentDto) {
-                AppointmentDto createdAppointment = appointmentService.createAppointment(appointmentDto);
-                ServiceApiResponse<AppointmentDto> response = new ServiceApiResponse<>(
+                AppointmentResponseDto createdAppointment = appointmentService.createAppointment(appointmentDto);
+                ServiceApiResponse<AppointmentResponseDto> response = new ServiceApiResponse<>(
                                 "success",
                                 "Appointment created successfully",
                                 createdAppointment);
@@ -68,11 +69,11 @@ public class AppointmentController {
                         @ApiResponse(responseCode = "404", description = "Appointment not found")
         })
         @GetMapping("/{appointmentId}")
-        public ResponseEntity<ServiceApiResponse<AppointmentDto>> getAppointmentById(
+        public ResponseEntity<ServiceApiResponse<AppointmentResponseDto>> getAppointmentById(
                         @PathVariable String appointmentId) {
                 validAppointmentId(appointmentId);
-                AppointmentDto appointment = appointmentService.getAppointmentById(appointmentId);
-                ServiceApiResponse<AppointmentDto> response = new ServiceApiResponse<>(
+                AppointmentResponseDto appointment = appointmentService.getAppointmentById(appointmentId);
+                ServiceApiResponse<AppointmentResponseDto> response = new ServiceApiResponse<>(
                                 "success",
                                 "Appointment retrieved successfully",
                                 appointment);
