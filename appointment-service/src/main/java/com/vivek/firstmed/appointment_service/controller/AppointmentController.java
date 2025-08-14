@@ -87,12 +87,12 @@ public class AppointmentController {
                         @ApiResponse(responseCode = "404", description = "Appointment not found")
         })
         @PutMapping("/{appointmentId}")
-        public ResponseEntity<ServiceApiResponse<AppointmentDto>> updateAppointment(@PathVariable String appointmentId,
+        public ResponseEntity<ServiceApiResponse<AppointmentResponseDto>> updateAppointment(@PathVariable String appointmentId,
                         @Valid @RequestBody UpdateAppointmentDto updateAppointmentDto) {
                 validAppointmentId(appointmentId);
                 updateAppointmentDto.setAppointmentId(appointmentId);
-                AppointmentDto updatedAppointment = appointmentService.updateAppointment(updateAppointmentDto);
-                ServiceApiResponse<AppointmentDto> response = new ServiceApiResponse<>(
+                AppointmentResponseDto updatedAppointment = appointmentService.updateAppointment(updateAppointmentDto);
+                ServiceApiResponse<AppointmentResponseDto> response = new ServiceApiResponse<>(
                                 "success",
                                 "Appointment updated successfully",
                                 updatedAppointment);
@@ -121,10 +121,10 @@ public class AppointmentController {
                         @ApiResponse(responseCode = "200", description = "List of appointment retrieved successfully"),
                         @ApiResponse(responseCode = "404", description = "No appointment found")
         })
-        public ResponseEntity<ServiceApiResponse<Page<AppointmentDto>>> getAllAppointment(
+        public ResponseEntity<ServiceApiResponse<Page<AppointmentResponseDto>>> getAllAppointment(
                         @Parameter(hidden = true) @PageableDefault(size = 10, page = 0, sort = "appointmentId", direction = Sort.Direction.DESC) Pageable pageable) {
-                Page<AppointmentDto> appointments = appointmentService.getAllAppointments(pageable);
-                ServiceApiResponse<Page<AppointmentDto>> response = new ServiceApiResponse<>(
+                Page<AppointmentResponseDto> appointments = appointmentService.getAllAppointments(pageable);
+                ServiceApiResponse<Page<AppointmentResponseDto>> response = new ServiceApiResponse<>(
                                 "success",
                                 "All appointments retrieved successfully",
                                 appointments);
