@@ -138,12 +138,12 @@ public class AppointmentController {
                         @ApiResponse(responseCode = "404", description = "No appointments found for the patient")
         })
         @GetMapping("/patient/{patientId}")
-        public ResponseEntity<ServiceApiResponse<Page<AppointmentDto>>> getAppointmentByPatientId(
+        public ResponseEntity<ServiceApiResponse<Page<AppointmentResponseDto>>> getAppointmentByPatientId(
                         @Parameter(hidden = true) @PageableDefault(size = 10, page = 0, sort = "patientId", direction = Sort.Direction.DESC) Pageable pageable,
                         @PathVariable String patientId) {
                 validPatientId(patientId);
-                Page<AppointmentDto> appointments = appointmentService.getAppointmentByPatientId(pageable, patientId);
-                ServiceApiResponse<Page<AppointmentDto>> response = new ServiceApiResponse<>(
+                Page<AppointmentResponseDto> appointments = appointmentService.getAppointmentByPatientId(pageable, patientId);
+                ServiceApiResponse<Page<AppointmentResponseDto>> response = new ServiceApiResponse<>(
                                 "success",
                                 "Appointments for patient retrieved successfully",
                                 appointments);
@@ -157,12 +157,12 @@ public class AppointmentController {
                         @ApiResponse(responseCode = "404", description = "No appointments found for the doctor")
         })
         @GetMapping("/doctor/{doctorId}")
-        public ResponseEntity<ServiceApiResponse<Page<AppointmentDto>>> getAppointmentByDoctorId(
+        public ResponseEntity<ServiceApiResponse<Page<AppointmentResponseDto>>> getAppointmentByDoctorId(
                         @Parameter(hidden = true) @PageableDefault(size = 10, page = 0, sort = "doctorId", direction = Sort.Direction.DESC) Pageable pageable,
                         @PathVariable String doctorId) {
                 validDoctorId(doctorId);
-                Page<AppointmentDto> appointments = appointmentService.getAppointmentByDoctorId(pageable, doctorId);
-                ServiceApiResponse<Page<AppointmentDto>> response = new ServiceApiResponse<>(
+                Page<AppointmentResponseDto> appointments = appointmentService.getAppointmentByDoctorId(pageable, doctorId);
+                ServiceApiResponse<Page<AppointmentResponseDto>> response = new ServiceApiResponse<>(
                                 "success",
                                 "Appointments for doctor retrieved successfully",
                                 appointments);
