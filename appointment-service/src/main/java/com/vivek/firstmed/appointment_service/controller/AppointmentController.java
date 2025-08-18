@@ -210,13 +210,13 @@ public class AppointmentController {
                         @ApiResponse(responseCode = "404", description = "No appointments found for the doctor and date")
         })
         @GetMapping("/doctor/{doctorId}/date/{date}")
-        public ResponseEntity<ServiceApiResponse<Page<AppointmentDto>>> getAppointmentByDoctorAndDate(
+        public ResponseEntity<ServiceApiResponse<Page<AppointmentResponseDto>>> getAppointmentByDoctorAndDate(
                         @Parameter(hidden = true) @PageableDefault(size = 10, page = 0, sort = "appointmentDate", direction = Sort.Direction.DESC) Pageable pageable,
                         @PathVariable String doctorId, @PathVariable String date) {
                 validDoctorId(doctorId);
-                Page<AppointmentDto> appointments = appointmentService.getAppointmentByDoctorAndDate(pageable, doctorId,
+                Page<AppointmentResponseDto> appointments = appointmentService.getAppointmentByDoctorAndDate(pageable, doctorId,
                                 date);
-                ServiceApiResponse<Page<AppointmentDto>> response = new ServiceApiResponse<>(
+                ServiceApiResponse<Page<AppointmentResponseDto>> response = new ServiceApiResponse<>(
                                 "success",
                                 "Appointments for doctor and date retrieved successfully",
                                 appointments);
@@ -230,12 +230,12 @@ public class AppointmentController {
                         @ApiResponse(responseCode = "404", description = "No appointments found for the patient and date")
         })
         @GetMapping("/patient/{patientId}/date/{date}")
-        public ResponseEntity<ServiceApiResponse<Page<AppointmentDto>>> getAppointmentByPatientAndDate(
+        public ResponseEntity<ServiceApiResponse<Page<AppointmentResponseDto>>> getAppointmentByPatientAndDate(
                         @Parameter(hidden = true) @PageableDefault(size = 10, page = 0, sort = "appointmentDate", direction = Sort.Direction.DESC) Pageable pageable,
                         @PathVariable String patientId, @PathVariable String date) {
                 validPatientId(patientId);
-                Page<AppointmentDto> appointments = appointmentService.getAppointmentByPatientAndDate(pageable, patientId, date);
-                ServiceApiResponse<Page<AppointmentDto>> response = new ServiceApiResponse<>(
+                Page<AppointmentResponseDto> appointments = appointmentService.getAppointmentByPatientAndDate(pageable, patientId, date);
+                ServiceApiResponse<Page<AppointmentResponseDto>> response = new ServiceApiResponse<>(
                                 "success",
                                 "Appointments for patient and date retrieved successfully",
                                 appointments);
