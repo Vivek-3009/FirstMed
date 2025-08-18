@@ -15,4 +15,5 @@ public interface PatientService {
     public void deletePatient(String patientId);
     public PatientDto addFamilyMember(String primaryPatientId, PatientDto familyMemberDto);
     public void removeFamilyMember(String primaryPatientId, String familyMemberId);
+    public Page<PatientDto> getFamilyMembersByPatientId(String patientId, Pageable pageable);
 }

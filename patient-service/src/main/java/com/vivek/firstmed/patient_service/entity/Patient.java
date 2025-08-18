@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
+import org.hibernate.annotations.Where;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -74,6 +75,7 @@ public class Patient {
     @JsonManagedReference
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
+    @Where(clause = "is_deleted = false")
     private List<Patient> familyMembers;
 
     @OneToOne(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true)

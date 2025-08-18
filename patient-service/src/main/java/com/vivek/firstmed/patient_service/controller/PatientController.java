@@ -166,4 +166,23 @@ public class PatientController {
                                 null);
                 return ResponseEntity.ok(response);
         }
+        @Operation(summary = "Get patient family members by primary patient ID")
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = "200", description = "Family members retrieved successfully"),
+                        @ApiResponse(responseCode = "400", description = "Invalid Patient ID format"),
+                        @ApiResponse(responseCode = "404", description = "Patient not found")
+        })
+        @GetMapping("/{patientId}/family")
+        public ResponseEntity<ServiceApiResponse<Page<PatientDto>>> getFamilyMembersByPatientId(
+                @Parameter(hidden = true)
+                @PageableDefault(size = 10, page = 0, sort = "patientId", direction = Sort.Direction.DESC) Pageable pageable, 
+                @PathVariable String patientId) {
+                validatePatientId(patientId);
+                Page<PatientDto> familyMembers = patientService.getFamilyMembersByPatientId(patientId, pageable);
+                ServiceApiResponse<Page<PatientDto>> response = new ServiceApiResponse<>(
+                                "success",
+                                "Family members retrieved successfully",
+                                familyMembers);
+                return ResponseEntity.ok(response);
+        }       
 }
