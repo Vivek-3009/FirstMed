@@ -249,11 +249,11 @@ public class AppointmentController {
                         @ApiResponse(responseCode = "404", description = "Appointment not found")
         })
         @PutMapping("/{appointmentId}/confirm")
-        public ResponseEntity<ServiceApiResponse<AppointmentDto>> confirmAppointment(
+        public ResponseEntity<ServiceApiResponse<AppointmentResponseDto>> confirmAppointment(
                         @PathVariable String appointmentId) {
                 validAppointmentId(appointmentId);
-                AppointmentDto confirmedAppointment = appointmentService.confirmAppointment(appointmentId);
-                ServiceApiResponse<AppointmentDto> response = new ServiceApiResponse<>(
+                AppointmentResponseDto confirmedAppointment = appointmentService.confirmAppointment(appointmentId);
+                ServiceApiResponse<AppointmentResponseDto> response = new ServiceApiResponse<>(
                                 "success",
                                 "Appointment confirmed successfully",
                                 confirmedAppointment);
