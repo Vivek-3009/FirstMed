@@ -267,11 +267,11 @@ public class AppointmentController {
                         @ApiResponse(responseCode = "404", description = "Appointment not found")
         })
         @PutMapping("/{appointmentId}/cancel")
-        public ResponseEntity<ServiceApiResponse<AppointmentDto>> cancelAppointment(
+        public ResponseEntity<ServiceApiResponse<AppointmentResponseDto>> cancelAppointment(
                         @PathVariable String appointmentId) {
                 validAppointmentId(appointmentId);
-                AppointmentDto cancelledAppointment = appointmentService.cancelAppointment(appointmentId);
-                ServiceApiResponse<AppointmentDto> response = new ServiceApiResponse<>(
+                AppointmentResponseDto cancelledAppointment = appointmentService.cancelAppointment(appointmentId);
+                ServiceApiResponse<AppointmentResponseDto> response = new ServiceApiResponse<>(
                                 "success",
                                 "Appointment cancelled successfully",
                                 cancelledAppointment);
