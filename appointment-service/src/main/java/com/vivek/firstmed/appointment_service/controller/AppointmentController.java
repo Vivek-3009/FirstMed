@@ -285,12 +285,12 @@ public class AppointmentController {
                         @ApiResponse(responseCode = "404", description = "Appointment not found")
         })
         @PutMapping("/{appointmentId}/reschedule")
-        public ResponseEntity<ServiceApiResponse<AppointmentDto>> rescheduleAppointment(
+        public ResponseEntity<ServiceApiResponse<AppointmentResponseDto>> rescheduleAppointment(
                         @PathVariable String appointmentId,
                         @RequestBody RescheduleAppointmentDto rescheduleAppointmentDto) {
                 validAppointmentId(appointmentId);
-                AppointmentDto rescheduledAppointment = appointmentService.rescheduleAppointment(rescheduleAppointmentDto);
-                ServiceApiResponse<AppointmentDto> response = new ServiceApiResponse<>(
+                AppointmentResponseDto rescheduledAppointment = appointmentService.rescheduleAppointment(rescheduleAppointmentDto);
+                ServiceApiResponse<AppointmentResponseDto> response = new ServiceApiResponse<>(
                                 "success",
                                 "Appointment rescheduled successfully",
                                 rescheduledAppointment);
