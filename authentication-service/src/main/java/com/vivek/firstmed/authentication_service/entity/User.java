@@ -48,7 +48,6 @@ public class User {
     @Builder.Default
     private boolean isDeleted = false;
 
-    // Many-to-Many with roles
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "user_roles",
