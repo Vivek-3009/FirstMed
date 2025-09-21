@@ -6,8 +6,14 @@ import java.util.Map;
 
 import javax.crypto.SecretKey;
 
-import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm;
 import org.springframework.stereotype.Component;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.JwtBuilder;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 
 @Component
 public class JwtUtil {
@@ -29,6 +35,10 @@ public class JwtUtil {
                 .setExpiration(Date.from(now.plusSeconds(ttlSeconds)));
         if (claims != null && !claims.isEmpty()) b.addClaims(claims);
         return b.signWith(key, SignatureAlgorithm.HS256).compact();
+    }
+
+    public Jws<Claims> parseClaims(String token) {
+        return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
     }
     
 }
