@@ -41,4 +41,9 @@ public class JwtUtil {
         return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
     }
     
+    public String getSubject(String token) {
+        return parseClaims(token).getBody().getSubject();
+    }
+
+    
 }
