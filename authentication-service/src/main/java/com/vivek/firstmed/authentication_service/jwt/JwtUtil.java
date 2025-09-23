@@ -6,6 +6,7 @@ import java.util.Map;
 
 import javax.crypto.SecretKey;
 
+import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.stereotype.Component;
 
 import io.jsonwebtoken.Claims;
@@ -40,10 +41,17 @@ public class JwtUtil {
     public Jws<Claims> parseClaims(String token) {
         return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
     }
-    
+
     public String getSubject(String token) {
         return parseClaims(token).getBody().getSubject();
     }
 
-    
+    public boolean isValid(String token) {
+        try {
+            parseClaims(token);
+            return true;
+        } catch (JwtException e) {
+            return false;
+        }
+    }
 }
