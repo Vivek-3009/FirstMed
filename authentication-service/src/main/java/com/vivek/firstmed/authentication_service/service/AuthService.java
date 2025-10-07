@@ -25,6 +25,9 @@ public class AuthService {
 
     @Transactional
     public void register(RegisterRequest req) {
+        if (userRepo.existsByUsername(req.username())) {
+            throw new IllegalArgumentException("Username already exists");
+        }
     }
     
 }
