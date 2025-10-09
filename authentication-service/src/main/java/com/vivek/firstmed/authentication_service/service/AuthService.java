@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.vivek.firstmed.authentication_service.dto.RegisterRequest;
+import com.vivek.firstmed.authentication_service.entity.Role;
 import com.vivek.firstmed.authentication_service.jwt.JwtUtil;
 import com.vivek.firstmed.authentication_service.repository.RefreshTokenRepository;
 import com.vivek.firstmed.authentication_service.repository.RoleRepository;
@@ -31,6 +32,9 @@ public class AuthService {
         if (req.getEmail() != null && userRepo.existsByEmail(req.getEmail())) {
             throw new IllegalArgumentException("Email already exists");
         }
+        Role role = roleRepo.findByRoleName("ROLE_PATIENT")
+                .orElseGet(() -> roleRepo.save(Role.builder().roleName("ROLE_PATIENT").build()));
+
     }
     
 }
