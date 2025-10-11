@@ -47,6 +47,8 @@ public class AuthService {
                 .accountNonLocked(true)
                 .roles(Set.of(role))
                 .build();
+
+        userRepo.save(user);
     }
     
 }
