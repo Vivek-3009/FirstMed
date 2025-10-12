@@ -7,6 +7,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.vivek.firstmed.authentication_service.dto.AuthRequest;
+import com.vivek.firstmed.authentication_service.dto.AuthResponse;
 import com.vivek.firstmed.authentication_service.dto.RegisterRequest;
 import com.vivek.firstmed.authentication_service.entity.Role;
 import com.vivek.firstmed.authentication_service.entity.User;
@@ -50,5 +52,7 @@ public class AuthService {
 
         userRepo.save(user);
     }
+
+    public AuthResponse login(AuthRequest req){}
     
 }
