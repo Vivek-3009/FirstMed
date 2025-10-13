@@ -53,6 +53,7 @@ public class AuthService {
         userRepo.save(user);
     }
 
+    @Transactional(readOnly = true)
     public AuthResponse login(AuthRequest req){}
     
 }
