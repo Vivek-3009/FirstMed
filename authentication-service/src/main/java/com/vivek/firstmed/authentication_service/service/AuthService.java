@@ -54,6 +54,9 @@ public class AuthService {
     }
 
     @Transactional(readOnly = true)
-    public AuthResponse login(AuthRequest req){}
+    public AuthResponse login(AuthRequest req){
+        User user = userRepo.findByUsername(req.getUsername())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid credentials"));
+    }
     
 }
