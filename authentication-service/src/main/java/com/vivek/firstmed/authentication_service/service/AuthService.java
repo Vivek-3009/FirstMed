@@ -57,6 +57,10 @@ public class AuthService {
     public AuthResponse login(AuthRequest req){
         User user = userRepo.findByUsername(req.getUsername())
                 .orElseThrow(() -> new IllegalArgumentException("Invalid credentials"));
+        
+        if (!passwordEncoder.matches(req.getPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("Invalid credentials");
+        }
     }
     
 }
