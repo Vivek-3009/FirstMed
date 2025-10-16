@@ -61,6 +61,7 @@ public class AuthService {
         if (!passwordEncoder.matches(req.getPassword(), user.getPassword())) {
             throw new IllegalArgumentException("Invalid credentials");
         }
+        long accessExp = Long.parseLong(env.getProperty("security.jwt.access-exp", "900"));
     }
     
 }
