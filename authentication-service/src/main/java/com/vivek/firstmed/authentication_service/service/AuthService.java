@@ -62,6 +62,8 @@ public class AuthService {
             throw new IllegalArgumentException("Invalid credentials");
         }
         long accessExp = Long.parseLong(env.getProperty("security.jwt.access-exp", "900"));
+        long refreshExp = Long.parseLong(env.getProperty("security.jwt.refresh-exp", "2592000"));
+
     }
     
 }
