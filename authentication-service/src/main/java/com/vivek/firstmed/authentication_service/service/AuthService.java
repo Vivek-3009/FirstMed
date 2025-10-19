@@ -1,5 +1,6 @@
 package com.vivek.firstmed.authentication_service.service;
 
+import java.util.Map;
 import java.util.Set;
 
 import org.springframework.core.env.Environment;
@@ -63,6 +64,12 @@ public class AuthService {
         }
         long accessExp = Long.parseLong(env.getProperty("security.jwt.access-exp", "900"));
         long refreshExp = Long.parseLong(env.getProperty("security.jwt.refresh-exp", "2592000"));
+        
+         String accessToken = jwtUtil.generateToken(
+                user.getUsername(),
+                accessExp,
+                Map.of("uid", user.getUserId(), "roles", user.getRoles().stream().map(Role::getRoleName).toList())
+        );
 
     }
     
