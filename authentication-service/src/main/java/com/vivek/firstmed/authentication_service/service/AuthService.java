@@ -1,5 +1,6 @@
 package com.vivek.firstmed.authentication_service.service;
 
+import java.time.Instant;
 import java.util.Map;
 import java.util.Set;
 
@@ -11,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.vivek.firstmed.authentication_service.dto.AuthRequest;
 import com.vivek.firstmed.authentication_service.dto.AuthResponse;
 import com.vivek.firstmed.authentication_service.dto.RegisterRequest;
+import com.vivek.firstmed.authentication_service.entity.RefreshToken;
 import com.vivek.firstmed.authentication_service.entity.Role;
 import com.vivek.firstmed.authentication_service.entity.User;
 import com.vivek.firstmed.authentication_service.jwt.JwtUtil;
@@ -70,6 +72,14 @@ public class AuthService {
                 accessExp,
                 Map.of("uid", user.getUserId(), "roles", user.getRoles().stream().map(Role::getRoleName).toList())
         );
+
+        String refreshTokenStr = jwtUtil.generateToken(user.getUsername(), refreshExp, Map.of("type", "refresh"));
+
+        RefreshToken rt = RefreshToken.builder()
+                .token(refreshTokenStr)
+                .expiryDate(Instant.now().plusSeconds(refreshExp))
+                .user(user)
+                .build();
 
     }
     
