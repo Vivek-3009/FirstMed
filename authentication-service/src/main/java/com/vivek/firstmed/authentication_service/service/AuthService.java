@@ -81,6 +81,8 @@ public class AuthService {
                 .user(user)
                 .build();
 
+        refreshRepo.save(rt);
+
     }
     
 }
