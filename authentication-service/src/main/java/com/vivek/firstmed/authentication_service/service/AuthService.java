@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.vivek.firstmed.authentication_service.dto.AuthRequest;
 import com.vivek.firstmed.authentication_service.dto.AuthResponse;
+import com.vivek.firstmed.authentication_service.dto.RefreshRequest;
 import com.vivek.firstmed.authentication_service.dto.RegisterRequest;
 import com.vivek.firstmed.authentication_service.entity.RefreshToken;
 import com.vivek.firstmed.authentication_service.entity.Role;
@@ -84,6 +85,10 @@ public class AuthService {
         refreshRepo.save(rt);
         return new AuthResponse(accessToken, refreshTokenStr, accessExp);
 
+    }
+
+    public AuthResponse refresh(RefreshRequest req) {
+        
     }
     
 }
