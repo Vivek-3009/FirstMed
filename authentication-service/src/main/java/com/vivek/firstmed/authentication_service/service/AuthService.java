@@ -87,8 +87,9 @@ public class AuthService {
 
     }
 
+    @Transactional
     public AuthResponse refresh(RefreshRequest req) {
-        
+
     }
     
 }
