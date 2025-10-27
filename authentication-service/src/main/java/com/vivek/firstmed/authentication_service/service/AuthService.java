@@ -2,6 +2,7 @@ package com.vivek.firstmed.authentication_service.service;
 
 import java.time.Instant;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.core.env.Environment;
@@ -89,7 +90,7 @@ public class AuthService {
 
     @Transactional
     public AuthResponse refresh(RefreshRequest req) {
-
+         Optional<RefreshToken> refeshToken = refreshRepo.findByToken(req.getRefreshToken());
     }
     
 }
