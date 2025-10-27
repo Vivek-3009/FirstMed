@@ -90,7 +90,9 @@ public class AuthService {
 
     @Transactional
     public AuthResponse refresh(RefreshRequest req) {
-         Optional<RefreshToken> refeshToken = refreshRepo.findByToken(req.getRefreshToken());
+        Optional<RefreshToken> refeshToken = refreshRepo.findByToken(req.getRefreshToken());
+        RefreshToken token = refeshToken.orElseThrow(() -> new IllegalArgumentException("Invalid refresh token"));
+
     }
     
 }
