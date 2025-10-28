@@ -92,7 +92,10 @@ public class AuthService {
     public AuthResponse refresh(RefreshRequest req) {
         Optional<RefreshToken> refeshToken = refreshRepo.findByToken(req.getRefreshToken());
         RefreshToken token = refeshToken.orElseThrow(() -> new IllegalArgumentException("Invalid refresh token"));
-
+        
+        if (token.getExpiryDate().isBefore(Instant.now())) {
+            
+        }
     }
     
 }
