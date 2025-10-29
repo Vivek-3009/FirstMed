@@ -94,7 +94,8 @@ public class AuthService {
         RefreshToken token = refeshToken.orElseThrow(() -> new IllegalArgumentException("Invalid refresh token"));
         
         if (token.getExpiryDate().isBefore(Instant.now())) {
-            
+            refreshRepo.delete(token);
+            throw new IllegalArgumentException("Refresh token expired");            
         }
     }
     
