@@ -95,7 +95,7 @@ public class AuthService {
         
         if (token.getExpiryDate().isBefore(Instant.now())) {
             refreshRepo.delete(token);
-            throw new IllegalArgumentException("Refresh token expired");            
+            throw new IllegalArgumentException("Refresh token expired");          
         }
     }
     
