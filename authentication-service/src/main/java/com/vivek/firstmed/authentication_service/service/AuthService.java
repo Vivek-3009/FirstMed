@@ -98,7 +98,8 @@ public class AuthService {
             throw new IllegalArgumentException("Refresh token expired");          
         }
         String username = jwtUtil.getSubject(req.getRefreshToken());
-        
+        User user = userRepo.findByUsername(username).orElseThrow();
+
     }
     
 }
