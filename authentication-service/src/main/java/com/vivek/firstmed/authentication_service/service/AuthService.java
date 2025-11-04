@@ -99,6 +99,8 @@ public class AuthService {
         }
         String username = jwtUtil.getSubject(req.getRefreshToken());
         User user = userRepo.findByUsername(username).orElseThrow();
+         long accessExp = Long.parseLong(env.getProperty("security.jwt.access-exp", "900"));
+
 
     }
     
