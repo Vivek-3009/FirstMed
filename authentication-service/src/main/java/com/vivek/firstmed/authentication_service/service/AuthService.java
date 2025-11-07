@@ -101,7 +101,12 @@ public class AuthService {
         User user = userRepo.findByUsername(username).orElseThrow();
         long accessExp = Long.parseLong(env.getProperty("security.jwt.access-exp", "900"));
 
-         String newAccess = jwtUtil.generateToken();
+        String newAccess = jwtUtil.generateToken(
+            user.getUsername(),
+            accessExp,
+            Map.of("uid", user.getUserId(), "roles", user.getRoles().stream().map(Role::getRoleName).toList())
+        
+        );
 
     }
     
