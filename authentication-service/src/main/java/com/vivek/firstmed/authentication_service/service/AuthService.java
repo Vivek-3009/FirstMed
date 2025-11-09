@@ -107,8 +107,7 @@ public class AuthService {
             Map.of("uid", user.getUserId(), "roles", user.getRoles().stream().map(Role::getRoleName).toList())
         );
 
-        return new AuthResponse(newAccess, req.refreshToken(), accessExp);
-
+        return new AuthResponse(newAccess, req.getRefreshToken(), accessExp);
 
     }
     
