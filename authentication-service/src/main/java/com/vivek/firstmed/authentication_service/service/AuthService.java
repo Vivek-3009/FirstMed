@@ -109,6 +109,8 @@ public class AuthService {
 
         return new AuthResponse(newAccess, req.getRefreshToken(), accessExp);
 
+        public boolean validate(String token){}
+
     }
     
 }
