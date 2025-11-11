@@ -108,9 +108,10 @@ public class AuthService {
         );
 
         return new AuthResponse(newAccess, req.getRefreshToken(), accessExp);
+    }
 
-        public boolean validate(String token){}
-
+    public boolean validate(String token){
+        return jwtUtil.isValid(token);
     }
     
 }
