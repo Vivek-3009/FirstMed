@@ -110,6 +110,7 @@ public class AuthService {
         return new AuthResponse(newAccess, req.getRefreshToken(), accessExp);
     }
 
+    @Transactional(readOnly = true)
     public boolean validate(String token){
         return jwtUtil.isValid(token);
     }
