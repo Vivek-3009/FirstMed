@@ -8,8 +8,13 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @ControllerAdvice
@@ -94,4 +99,47 @@ public class GlobalExceptionHandler {
         );
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    @ExceptionHandler(InvalidFormatException.class)
+        public ResponseEntity<ErrorResponse> handleInvalidFormatException(InvalidFormatException ex,
+                        HttpServletRequest request) {
+
+                Map<String, String> fieldErrors = new HashMap<>();
+
+                List<JsonMappingException.Reference> path = ex.getPath();
+                String field = path.isEmpty() ? "unknown" : path.get(path.size() - 1).getFieldName();
+
+                String expectedType = ex.getTargetType().getSimpleName();
+                Object invalidValue = ex.getValue();
+
+                String message = switch (expectedType) {
+                        case "LocalDate" -> String.format(
+                                        "Invalid format for field '%s'. Value '%s' is not a valid date. Please use 'yyyy-MM-dd' (e.g., 2025-07-14).",
+                                        field, invalidValue);
+                        case "LocalTime" -> String.format(
+                                        "Invalid format for field '%s'. Value '%s' is not a valid time. Please use 'HH:mm' in 24-hour format (e.g., 14:30).",
+                                        field, invalidValue);
+                        case "Enum" -> {
+                                String validValues = Arrays.toString(ex.getTargetType().getEnumConstants());
+                                yield String.format(
+                                                "Invalid value '%s' for field '%s'. Please use one of the allowed values: %s.",
+                                                invalidValue, field, validValues);
+                        }
+                        default -> String.format(
+                                        "Invalid format for field '%s'. Value '%s' does not match expected type: %s.",
+                                        field, invalidValue, expectedType);
+                };
+
+                fieldErrors.put(field, message);
+
+                ErrorResponse errorResponse = new ErrorResponse(
+                                LocalDateTime.now(),
+                                HttpStatus.BAD_REQUEST.value(),
+                                "Invalid Format",
+                                String.format("The entered value '%s' is not valid for field '%s'.", invalidValue, field),
+                                request.getRequestURI(),
+                                fieldErrors);
+
+                return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+        }
 }

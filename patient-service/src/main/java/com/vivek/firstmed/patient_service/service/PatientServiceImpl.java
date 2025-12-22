@@ -4,16 +4,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.vivek.firstmed.patient_service.dto.PatientDto;
+import com.vivek.firstmed.patient_service.dto.UpdatePatientDto;
 import com.vivek.firstmed.patient_service.entity.Patient;
 import com.vivek.firstmed.patient_service.exception.ResourceNotFoundException;
 import com.vivek.firstmed.patient_service.repository.PatientRepository;
 import com.vivek.firstmed.patient_service.util.PatientMapperUtil;
 
-
+import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class PatientServiceImpl implements PatientService {
@@ -48,35 +52,54 @@ public class PatientServiceImpl implements PatientService {
     }
 
     @Transactional(readOnly = true)
-    public List<PatientDto> getAllPatients() {
-        return patientRepository.findAll()
-                .stream()
-                .map(patientMapperUtil::entityToDto)
-                .toList();
+    public Page<PatientDto> getAllPatients(Pageable pageable) {
+        Page<PatientDto> patients = patientRepository.findAll(pageable)
+                .map(patientMapperUtil::entityToDto);
+        if (patients.isEmpty()) {
+            throw new ResourceNotFoundException("No patients found.");
+        }
+        return patients;
     }
 
     @Transactional
-    public PatientDto updatePatient(String patientId, PatientDto patientDto) {
-        return patientRepository.findById(patientId).map(
+    public PatientDto updatePatient(UpdatePatientDto updatePatientDto) {
+        return patientRepository.findById(updatePatientDto.getPatientId()).map(
                 existingPatient -> {
-                    existingPatient.setFirstName(patientDto.getFirstName());
-                    existingPatient.setLastName(patientDto.getLastName());
-                    existingPatient.setGender(patientDto.getGender());
-                    existingPatient.setDateOfBirth(patientDto.getDateOfBirth());
-                    existingPatient.setPhoneNumber(patientDto.getPhoneNumber());
-                    existingPatient.setEmail(patientDto.getEmail());
-                    Patient updated = patientRepository.save(existingPatient);
-                    return patientMapperUtil.entityToDto(updated);
+                    existingPatient = patientMapperUtil.notNullFieldDtoToEntity(updatePatientDto, existingPatient);
+                    Patient updatedPatient = patientRepository.save(existingPatient);
+                    return patientMapperUtil.entityToDto(updatedPatient);
                 })
-                .orElseThrow(() -> new ResourceNotFoundException("Patient not found with ID: " + patientId));
+                .orElseThrow(
+                        () -> new ResourceNotFoundException(
+                                "Patient not found with ID: " + updatePatientDto.getPatientId()));
     }
+    // @Transactional
+    // public PatientDto updatePatient(PatientDto patientDto) {
+    // return patientRepository.findById(patientDto.getPatientId()).map(
+    // existingPatient -> {
+    // existingPatient.setFirstName(patientDto.getFirstName());
+    // existingPatient.setLastName(patientDto.getLastName());
+    // existingPatient.setGender(patientDto.getGender());
+    // existingPatient.setDateOfBirth(patientDto.getDateOfBirth());
+    // existingPatient.setPhoneNumber(patientDto.getPhoneNumber());
+    // existingPatient.setEmail(patientDto.getEmail());
+    // Patient updated = patientRepository.save(existingPatient);
+    // return patientMapperUtil.entityToDto(updated);
+    // })
+    // .orElseThrow(
+    // () -> new ResourceNotFoundException("Patient not found with ID: " +
+    // patientDto.getPatientId()));
+    // }
 
     @Transactional
     public void deletePatient(String patientId) {
-        if (!patientRepository.existsById(patientId)) {
-            throw new ResourceNotFoundException("Patient not found with ID: " + patientId);
-        }
-        patientRepository.deleteById(patientId);
+        patientRepository.findById(patientId)
+                .map(existingPatient -> {
+                    existingPatient.setDeleted(true);
+                    Patient updatedPatient = patientRepository.save(existingPatient);
+                    return patientMapperUtil.entityToDto(updatedPatient);
+                })
+                .orElseThrow(() -> new ResourceNotFoundException("Patient not found with ID: " + patientId));
     }
 
     @Transactional
@@ -84,7 +107,7 @@ public class PatientServiceImpl implements PatientService {
         Patient primaryPatient = patientRepository.findById(primaryPatientId)
                 .orElseThrow(
                         () -> new ResourceNotFoundException("Primary patient not found with ID: " + primaryPatientId));
-        if(primaryPatient.getPrimaryPatient() != null) {
+        if (primaryPatient.getPrimaryPatient() != null) {
             throw new IllegalArgumentException("Cannot add family member to a family member.");
         }
         String newId = idGeneratorService.generatePatientId();
@@ -115,6 +138,18 @@ public class PatientServiceImpl implements PatientService {
         primaryPatient.getFamilyMembers().remove(familyMember);
         patientRepository.save(primaryPatient);
         patientRepository.deleteById(familyMemberId);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<PatientDto> getFamilyMembersByPatientId(String patientId, Pageable pageable) {
+        Patient primaryPatient = patientRepository.findById(patientId)
+                .orElseThrow(() -> new EntityNotFoundException("Patient not found"));
+        List<PatientDto> filteredFamilyMembers = primaryPatient.getFamilyMembers().stream()
+                                            .map(patientMapperUtil::entityToDto).toList();
+        int start = (int) pageable.getOffset();
+        int end = Math.min(start + pageable.getPageSize(), filteredFamilyMembers.size());
+        List<PatientDto> pageContent = filteredFamilyMembers.subList(start, end);
+        return new PageImpl<>(pageContent, pageable, filteredFamilyMembers.size());
     }
 
 }

@@ -17,7 +17,7 @@ public class OpenApiConfig {
                 .title("Doctor Service API")
                 .version("1.0")
                 .description("API documentation for doctor microservice")
-                .contact(new Contact().name("FirstMed").email("vivekbisht309@gmail.com"))
+                .contact(new Contact().name("FirstMed").email("vivekbisht3009@gmail.com"))
             );
     }
 }

@@ -1,0 +1,300 @@
+package com.vivek.firstmed.appointment_service.controller;
+
+import static com.vivek.firstmed.appointment_service.util.ValidationUtils.validAppointmentId;
+import static com.vivek.firstmed.appointment_service.util.ValidationUtils.validDoctorId;
+import static com.vivek.firstmed.appointment_service.util.ValidationUtils.validPatientId;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.vivek.firstmed.appointment_service.dto.AppointmentDto;
+import com.vivek.firstmed.appointment_service.dto.AppointmentResponseDto;
+import com.vivek.firstmed.appointment_service.dto.RescheduleAppointmentDto;
+import com.vivek.firstmed.appointment_service.dto.ServiceApiResponse;
+import com.vivek.firstmed.appointment_service.dto.UpdateAppointmentDto;
+import com.vivek.firstmed.appointment_service.service.AppointmentService;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+
+@RestController
+@RequestMapping("/api/appointments")
+@Tag(name = "Appointments", description = "Appointment management APIs")
+@Validated
+public class AppointmentController {
+
+        private final AppointmentService appointmentService;
+
+        public AppointmentController(AppointmentService appointmentService) {
+                this.appointmentService = appointmentService;
+        }
+
+        @Operation(summary = "Create a new appointment")
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = "201", description = "Appointement created successfully"),
+                        @ApiResponse(responseCode = "400", description = "Invalid input")
+        })
+        @PostMapping
+        public ResponseEntity<ServiceApiResponse<AppointmentResponseDto>> createAppointment(
+                        @Valid @RequestBody AppointmentDto appointmentDto) {
+                AppointmentResponseDto createdAppointment = appointmentService.createAppointment(appointmentDto);
+                ServiceApiResponse<AppointmentResponseDto> response = new ServiceApiResponse<>(
+                                "success",
+                                "Appointment created successfully",
+                                createdAppointment);
+                return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        }
+
+        @Operation(summary = "Get appointment by ID")
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = "200", description = "Appointment retrieved successfully"),
+                        @ApiResponse(responseCode = "400", description = "Invalid appointment ID format"),
+                        @ApiResponse(responseCode = "404", description = "Appointment not found")
+        })
+        @GetMapping("/{appointmentId}")
+        public ResponseEntity<ServiceApiResponse<AppointmentResponseDto>> getAppointmentById(
+                        @PathVariable String appointmentId) {
+                validAppointmentId(appointmentId);
+                AppointmentResponseDto appointment = appointmentService.getAppointmentById(appointmentId);
+                ServiceApiResponse<AppointmentResponseDto> response = new ServiceApiResponse<>(
+                                "success",
+                                "Appointment retrieved successfully",
+                                appointment);
+                return ResponseEntity.ok(response);
+        }
+
+        @Operation(summary = "Update an existing appointment")
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = "200", description = "Appointment updated successfully"),
+                        @ApiResponse(responseCode = "400", description = "Invalid input"),
+                        @ApiResponse(responseCode = "404", description = "Appointment not found")
+        })
+        @PutMapping("/{appointmentId}")
+        public ResponseEntity<ServiceApiResponse<AppointmentResponseDto>> updateAppointment(@PathVariable String appointmentId,
+                        @Valid @RequestBody UpdateAppointmentDto updateAppointmentDto) {
+                validAppointmentId(appointmentId);
+                updateAppointmentDto.setAppointmentId(appointmentId);
+                AppointmentResponseDto updatedAppointment = appointmentService.updateAppointment(updateAppointmentDto);
+                ServiceApiResponse<AppointmentResponseDto> response = new ServiceApiResponse<>(
+                                "success",
+                                "Appointment updated successfully",
+                                updatedAppointment);
+                return ResponseEntity.ok(response);
+        }
+
+        @Operation(summary = "Delete a appointment by ID")
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = "204", description = "Appoinment deleted successfully"),
+                        @ApiResponse(responseCode = "400", description = "Invalid appointment ID format"),
+                        @ApiResponse(responseCode = "404", description = "Appointment not found")
+        })
+        @DeleteMapping("/{appointmentId}")
+        public ResponseEntity<ServiceApiResponse<Void>> deleteAppointment(@PathVariable String appointmentId) {
+                validAppointmentId(appointmentId);
+                appointmentService.deleteAppointment(appointmentId);
+                ServiceApiResponse<Void> response = new ServiceApiResponse<>(
+                                "success",
+                                "Appointment deleted successfully",
+                                null);
+                return ResponseEntity.ok(response);
+        }
+
+        @Operation(summary = "Get all appointments")
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = "200", description = "List of appointment retrieved successfully"),
+                        @ApiResponse(responseCode = "404", description = "No appointment found")
+        })
+        public ResponseEntity<ServiceApiResponse<Page<AppointmentResponseDto>>> getAllAppointment(
+                        @Parameter(hidden = true) @PageableDefault(size = 10, page = 0, sort = "appointmentId", direction = Sort.Direction.DESC) Pageable pageable) {
+                Page<AppointmentResponseDto> appointments = appointmentService.getAllAppointments(pageable);
+                ServiceApiResponse<Page<AppointmentResponseDto>> response = new ServiceApiResponse<>(
+                                "success",
+                                "All appointments retrieved successfully",
+                                appointments);
+                return ResponseEntity.ok(response);
+        }
+
+        @Operation(summary = "Get appointments by patient ID")
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = "200", description = "List of appointments retrieved successfully"),
+                        @ApiResponse(responseCode = "400", description = "Invalid patient ID format"),
+                        @ApiResponse(responseCode = "404", description = "No appointments found for the patient")
+        })
+        @GetMapping("/patient/{patientId}")
+        public ResponseEntity<ServiceApiResponse<Page<AppointmentResponseDto>>> getAppointmentByPatientId(
+                        @Parameter(hidden = true) @PageableDefault(size = 10, page = 0, sort = "patientId", direction = Sort.Direction.DESC) Pageable pageable,
+                        @PathVariable String patientId) {
+                validPatientId(patientId);
+                Page<AppointmentResponseDto> appointments = appointmentService.getAppointmentByPatientId(pageable, patientId);
+                ServiceApiResponse<Page<AppointmentResponseDto>> response = new ServiceApiResponse<>(
+                                "success",
+                                "Appointments for patient retrieved successfully",
+                                appointments);
+                return ResponseEntity.ok(response);
+        }
+
+        @Operation(summary = "Get appointments by doctor ID")
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = "200", description = "List of appointments retrieved successfully"),
+                        @ApiResponse(responseCode = "400", description = "Invalid doctor ID format"),
+                        @ApiResponse(responseCode = "404", description = "No appointments found for the doctor")
+        })
+        @GetMapping("/doctor/{doctorId}")
+        public ResponseEntity<ServiceApiResponse<Page<AppointmentResponseDto>>> getAppointmentByDoctorId(
+                        @Parameter(hidden = true) @PageableDefault(size = 10, page = 0, sort = "doctorId", direction = Sort.Direction.DESC) Pageable pageable,
+                        @PathVariable String doctorId) {
+                validDoctorId(doctorId);
+                Page<AppointmentResponseDto> appointments = appointmentService.getAppointmentByDoctorId(pageable, doctorId);
+                ServiceApiResponse<Page<AppointmentResponseDto>> response = new ServiceApiResponse<>(
+                                "success",
+                                "Appointments for doctor retrieved successfully",
+                                appointments);
+                return ResponseEntity.ok(response);
+        }
+
+        @Operation(summary = "Get appointments by date")
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = "200", description = "List of appointments retrieved successfully"),
+                        @ApiResponse(responseCode = "404", description = "No appointments found for the date")
+        })
+        @GetMapping("/date/{date}")
+        public ResponseEntity<ServiceApiResponse<Page<AppointmentResponseDto>>> getAppointmentByDate(
+                        @Parameter(hidden = true) @PageableDefault(size = 10, page = 0, sort = "startTime", direction = Sort.Direction.DESC) Pageable pageable,
+                        @PathVariable String date) {
+                Page<AppointmentResponseDto> appointments = appointmentService.getAppointmentByDate(pageable, date);
+                ServiceApiResponse<Page<AppointmentResponseDto>> response = new ServiceApiResponse<>(
+                                "success",
+                                "Appointments for date retrieved successfully",
+                                appointments);
+                return ResponseEntity.ok(response);
+        }
+
+        @Operation(summary = "Get appointments by status")
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = "200", description = "List of appointments retrieved successfully"),
+                        @ApiResponse(responseCode = "404", description = "No appointments found for the status")
+        })
+        @GetMapping("/status/{status}")
+        public ResponseEntity<ServiceApiResponse<Page<AppointmentResponseDto>>> getAppointmentByStatus(
+                        @Parameter(hidden = true) @PageableDefault(size = 10, page = 0, sort = "appointmentId", direction = Sort.Direction.DESC) Pageable pageable,
+                        @PathVariable String status) {
+                Page<AppointmentResponseDto> appointments = appointmentService.getAppointmentByStatus(pageable, status);
+                ServiceApiResponse<Page<AppointmentResponseDto>> response = new ServiceApiResponse<>(
+                                "success",
+                                "Appointments for status retrieved successfully",
+                                appointments);
+                return ResponseEntity.ok(response);
+        }
+
+        @Operation(summary = "Get appointments by doctor ID and date")
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = "200", description = "List of appointments retrieved successfully"),
+                        @ApiResponse(responseCode = "400", description = "Invalid doctor ID format or date format"),
+                        @ApiResponse(responseCode = "404", description = "No appointments found for the doctor and date")
+        })
+        @GetMapping("/doctor/{doctorId}/date/{date}")
+        public ResponseEntity<ServiceApiResponse<Page<AppointmentResponseDto>>> getAppointmentByDoctorAndDate(
+                        @Parameter(hidden = true) @PageableDefault(size = 10, page = 0, sort = "appointmentDate", direction = Sort.Direction.DESC) Pageable pageable,
+                        @PathVariable String doctorId, @PathVariable String date) {
+                validDoctorId(doctorId);
+                Page<AppointmentResponseDto> appointments = appointmentService.getAppointmentByDoctorAndDate(pageable, doctorId,
+                                date);
+                ServiceApiResponse<Page<AppointmentResponseDto>> response = new ServiceApiResponse<>(
+                                "success",
+                                "Appointments for doctor and date retrieved successfully",
+                                appointments);
+                return ResponseEntity.ok(response);
+        }
+
+        @Operation(summary = "Get appointments by patient ID and date")
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = "200", description = "List of appointments retrieved successfully"),
+                        @ApiResponse(responseCode = "400", description = "Invalid patient ID format or date format"),
+                        @ApiResponse(responseCode = "404", description = "No appointments found for the patient and date")
+        })
+        @GetMapping("/patient/{patientId}/date/{date}")
+        public ResponseEntity<ServiceApiResponse<Page<AppointmentResponseDto>>> getAppointmentByPatientAndDate(
+                        @Parameter(hidden = true) @PageableDefault(size = 10, page = 0, sort = "appointmentDate", direction = Sort.Direction.DESC) Pageable pageable,
+                        @PathVariable String patientId, @PathVariable String date) {
+                validPatientId(patientId);
+                Page<AppointmentResponseDto> appointments = appointmentService.getAppointmentByPatientAndDate(pageable, patientId, date);
+                ServiceApiResponse<Page<AppointmentResponseDto>> response = new ServiceApiResponse<>(
+                                "success",
+                                "Appointments for patient and date retrieved successfully",
+                                appointments);
+                return ResponseEntity.ok(response);
+        }
+
+        @Operation(summary = "Confirm an appointment")
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = "200", description = "Appointment confirmed successfully"),
+                        @ApiResponse(responseCode = "400", description = "Invalid appointment ID format"),
+                        @ApiResponse(responseCode = "404", description = "Appointment not found")
+        })
+        @PutMapping("/{appointmentId}/confirm")
+        public ResponseEntity<ServiceApiResponse<AppointmentResponseDto>> confirmAppointment(
+                        @PathVariable String appointmentId) {
+                validAppointmentId(appointmentId);
+                AppointmentResponseDto confirmedAppointment = appointmentService.confirmAppointment(appointmentId);
+                ServiceApiResponse<AppointmentResponseDto> response = new ServiceApiResponse<>(
+                                "success",
+                                "Appointment confirmed successfully",
+                                confirmedAppointment);
+                return ResponseEntity.ok(response);
+        }
+
+        @Operation(summary = "Cancel an appointment")
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = "200", description = "Appointment cancelled successfully"),
+                        @ApiResponse(responseCode = "400", description = "Invalid appointment ID format"),
+                        @ApiResponse(responseCode = "404", description = "Appointment not found")
+        })
+        @PutMapping("/{appointmentId}/cancel")
+        public ResponseEntity<ServiceApiResponse<AppointmentResponseDto>> cancelAppointment(
+                        @PathVariable String appointmentId) {
+                validAppointmentId(appointmentId);
+                AppointmentResponseDto cancelledAppointment = appointmentService.cancelAppointment(appointmentId);
+                ServiceApiResponse<AppointmentResponseDto> response = new ServiceApiResponse<>(
+                                "success",
+                                "Appointment cancelled successfully",
+                                cancelledAppointment);
+                return ResponseEntity.ok(response);
+        }
+
+        @Operation(summary = "Reschedule an appointment")
+        @ApiResponses(value = {
+                        @ApiResponse(responseCode = "200", description = "Appointment rescheduled successfully"),
+                        @ApiResponse(responseCode = "400", description = "Invalid appointment ID format or date/time format"),
+                        @ApiResponse(responseCode = "404", description = "Appointment not found")
+        })
+        @PutMapping("/{appointmentId}/reschedule")
+        public ResponseEntity<ServiceApiResponse<AppointmentResponseDto>> rescheduleAppointment(
+                        @PathVariable String appointmentId,
+                        @RequestBody RescheduleAppointmentDto rescheduleAppointmentDto) {
+                validAppointmentId(appointmentId);
+                AppointmentResponseDto rescheduledAppointment = appointmentService.rescheduleAppointment(rescheduleAppointmentDto);
+                ServiceApiResponse<AppointmentResponseDto> response = new ServiceApiResponse<>(
+                                "success",
+                                "Appointment rescheduled successfully",
+                                rescheduledAppointment);
+                return ResponseEntity.ok(response);
+        }
+
+}

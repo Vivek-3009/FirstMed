@@ -4,6 +4,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
 import com.vivek.firstmed.patient_service.dto.PatientDto;
+import com.vivek.firstmed.patient_service.dto.UpdatePatientDto;
 import com.vivek.firstmed.patient_service.entity.Patient;
 
 @Component
@@ -27,5 +28,13 @@ public class PatientMapperUtil {
             return null;
         }
         return modelMapper.map(patientDto, Patient.class);
+    }
+
+    public Patient notNullFieldDtoToEntity(UpdatePatientDto updatePatientDto, Patient existingPatient) {
+        if (updatePatientDto == null) {
+            return null;
+        }
+        modelMapper.map(updatePatientDto, existingPatient);
+        return existingPatient;
     }
 }

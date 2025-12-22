@@ -3,12 +3,19 @@ package com.vivek.firstmed.patient_service.entity;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+import org.hibernate.annotations.Where;
+
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.vivek.firstmed.patient_service.enums.Gender;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -27,6 +34,8 @@ import lombok.ToString;
 @AllArgsConstructor
 @Entity
 @Table(name = "patients")
+@SQLDelete(sql = "UPDATE patients SET is_deleted = true WHERE patient_id = ?")
+@SQLRestriction("is_deleted = false")
 public class Patient {
 
     @Id
@@ -39,8 +48,9 @@ public class Patient {
     @Column(nullable = false, length = 50)
     private String lastName;
 
-    @Column(nullable = false, length = 10)
-    private String gender;
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
 
     @Column(nullable = false)
     private LocalDate dateOfBirth;
@@ -65,10 +75,14 @@ public class Patient {
     @JsonManagedReference
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
+    @Where(clause = "is_deleted = false")
     private List<Patient> familyMembers;
 
     @OneToOne(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private HealthRecord healthRecord;
+
+    @Column(nullable = false)
+    private boolean isDeleted = false;
 }

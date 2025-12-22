@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.vivek.firstmed.patient_service.dto.HealthRecordDto;
+import com.vivek.firstmed.patient_service.dto.UpdateHealthRecordDto;
 import com.vivek.firstmed.patient_service.entity.HealthRecord;
 import com.vivek.firstmed.patient_service.entity.Patient;
 import com.vivek.firstmed.patient_service.exception.ResourceNotFoundException;
@@ -53,31 +54,40 @@ public class HealthRecordServiceImpl implements HealthRecordService {
     }
 
     @Transactional
-    public HealthRecordDto updateHealthRecord(String healthRecordId, HealthRecordDto healthRecordDto) {
-        return healthRecordRepository.findById(healthRecordId)
+    public HealthRecordDto updateHealthRecord(UpdateHealthRecordDto updateHealthRecordDto) {
+        return healthRecordRepository.findById(updateHealthRecordDto.getHealthRecordId())
                 .map(existingRecord -> {
-                    existingRecord.setBloodType(healthRecordDto.getBloodType());
-                    existingRecord.setAllergies(healthRecordDto.getAllergies());
-                    existingRecord.setChronicDiseases(healthRecordDto.getChronicDiseases());
-                    existingRecord.setMedications(healthRecordDto.getMedications());
-                    existingRecord.setMedicalHistory(healthRecordDto.getMedicalHistory());
-                    existingRecord.setLastUpdated(healthRecordDto.getLastUpdated());
+                    existingRecord = healthRecordMapperUtil.notNullFieldDtoToEntity(updateHealthRecordDto, existingRecord);
+                    HealthRecord updatedHealthRecord = healthRecordRepository.save(existingRecord);
+                    return healthRecordMapperUtil.entityToDto(updatedHealthRecord);
+                })
+                .orElseThrow(() -> new ResourceNotFoundException("Health record not found with ID: " + updateHealthRecordDto.getHealthRecordId()));
+    }
+    // @Transactional
+    // public HealthRecordDto updateHealthRecord(HealthRecordDto healthRecordDto) {
+    //     return healthRecordRepository.findById(healthRecordDto.getHealthRecordId())
+    //             .map(existingRecord -> {
+    //                 existingRecord.setBloodType(healthRecordDto.getBloodType());
+    //                 existingRecord.setAllergies(healthRecordDto.getAllergies());
+    //                 existingRecord.setChronicDiseases(healthRecordDto.getChronicDiseases());
+    //                 existingRecord.setMedications(healthRecordDto.getMedications());
+    //                 existingRecord.setMedicalHistory(healthRecordDto.getMedicalHistory());
+    //                 existingRecord.setLastUpdated(healthRecordDto.getLastUpdated());
+    //                 HealthRecord updated = healthRecordRepository.save(existingRecord);
+    //                 return healthRecordMapperUtil.entityToDto(updated);
+    //             })
+    //             .orElseThrow(() -> new ResourceNotFoundException("Health record not found with ID: " + healthRecordDto.getHealthRecordId()));
+    // }
+
+    @Transactional
+    public void deleteHealthRecord(String healthRecordId) {
+        healthRecordRepository.findById(healthRecordId)
+                .map(existingRecord -> {
+                    existingRecord.setDeleted(true);
                     HealthRecord updated = healthRecordRepository.save(existingRecord);
                     return healthRecordMapperUtil.entityToDto(updated);
                 })
                 .orElseThrow(() -> new ResourceNotFoundException("Health record not found with ID: " + healthRecordId));
-    }
-
-    @Transactional
-    public void deleteHealthRecord(String healthRecordId) {
-        HealthRecord healthRecord = healthRecordRepository.findById(healthRecordId)
-                .orElseThrow(() -> new ResourceNotFoundException("Health record not found with ID: " + healthRecordId));
-        Patient patient = healthRecord.getPatient();
-        if (patient != null) {
-            patient.setHealthRecord(null);
-            patientRepository.save(patient);
-        }
-        healthRecordRepository.deleteById(healthRecordId);
     }
 
     @Transactional(readOnly = true)
